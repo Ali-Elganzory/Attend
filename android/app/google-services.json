@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "573647636469",
+    "firebase_url": "https://attend-1a9b5.firebaseio.com",
+    "project_id": "attend-1a9b5",
+    "storage_bucket": "attend-1a9b5.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:573647636469:android:2823d7d9b9494c8a57c2bc",
+        "android_client_info": {
+          "package_name": "com.example.attend"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "573647636469-qf1km7skknhdlkaenvjlfp4lmk0qhpqd.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.attend",
+            "certificate_hash": "35cc85112cf0c8c4a598d8690d5ae1b309326db8"
+          }
+        },
+        {
+          "client_id": "573647636469-58j5d6mk4hgvrg2tpl1j770eruhkoj3c.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDOnydF8iBGgOCmhjaHe03Hf87HcnadjUY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "573647636469-58j5d6mk4hgvrg2tpl1j770eruhkoj3c.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
