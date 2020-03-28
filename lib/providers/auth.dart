@@ -9,11 +9,17 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../models/http_exception.dart';
 
 enum AuthMode { login, signup }
+enum UserType { student, instructor }
 
 class Auth with ChangeNotifier {
   AuthMode _authMode = AuthMode.login;
+  UserType _userType = UserType.student;
   bool _isLogin = true;
   bool _isLoading = false;
+
+  AuthMode get authMode {
+    return this._authMode;
+  }
 
   set authMode(AuthMode authMode) {
     this._authMode = authMode;
@@ -21,8 +27,17 @@ class Auth with ChangeNotifier {
     notifyListeners();
   }
 
-  AuthMode get authMode {
-    return this._authMode;
+  UserType get userType {
+    return this._userType;
+  }
+
+  set userType(UserType userType) {
+    this._userType = userType;
+    notifyListeners();
+  }
+
+  String _userTypeUrl() {
+    return this._userType == UserType.student ? "students" : "instructors";
   }
 
   bool get isLogin {
@@ -60,8 +75,8 @@ class Auth with ChangeNotifier {
     return _userId;
   }
 
-  Future<void> _authenticate(
-      String email, String password, String fullName, String urlSegment) async {
+  Future<void> _authenticate(String email, String password, String urlSegment,
+      String fullName, String collegeId) async {
     String url =
         'https://www.googleapis.com/identitytoolkit/v3/relyingparty/$urlSegment?key=AIzaSyB7yt-GQMFt4oEVzLYSZpdpcaH7VPyqfgU';
     try {
@@ -95,7 +110,21 @@ class Auth with ChangeNotifier {
 
       if (urlSegment == 'signupNewUser') {
         url =
-            'https://firestore.googleapis.com/v1/projects/attend-1a9b5/databases/(default)/documents/students/$userId';
+            'https://firestore.googleapis.com/v1/projects/attend-1a9b5/databases/(default)/documents/users/$userId';
+
+        response = await http.patch(url,
+            headers: {"Authorization": 'Bearer $token'},
+            body: json.encode({
+              "fields": {
+                'userType': {
+                  'stringValue':
+                      userType == UserType.student ? "students" : "instructors"
+                },
+              }
+            }));
+
+        url =
+            'https://firestore.googleapis.com/v1/projects/attend-1a9b5/databases/(default)/documents/${_userTypeUrl()}/$userId';
 
         response = await http.patch(url,
             headers: {"Authorization": 'Bearer $token'},
@@ -103,8 +132,8 @@ class Auth with ChangeNotifier {
               "fields": {
                 'fullName': {'stringValue': fullName},
                 'email': {'stringValue': email},
-                'phone': {'nullValue': null},
-                'address': {'nullValue': null}
+                if (userType == UserType.student)
+                  'collegeId': {'nullValue': collegeId},
               }
             }));
         final responseData = json.decode(response.body);
@@ -113,6 +142,14 @@ class Auth with ChangeNotifier {
         }
       }
 
+      url =
+          'https://firestore.googleapis.com/v1/projects/attend-1a9b5/databases/(default)/documents/users/$userId';
+
+      response = await http.get(
+        url,
+        headers: {"Authorization": 'Bearer $token'},
+      );
+
       notifyListeners();
       final prefs = await SharedPreferences.getInstance();
       final userData = json.encode(
@@ -120,6 +157,9 @@ class Auth with ChangeNotifier {
           'token': _token,
           'userId': _userId,
           'expiryDate': _expiryDate.toIso8601String(),
+          'userType': (json.decode(response.body)['fields']['userType'] as Map)
+              .values
+              .toList()[0],
         },
       );
       prefs.setString('userData', userData);
@@ -128,20 +168,15 @@ class Auth with ChangeNotifier {
     }
   }
 
-  Future<void> signup(String email, String password, String fullName) async {
-    try {
-      return _authenticate(email, password, fullName, 'signupNewUser');
-    } catch (error) {
-      throw error;
-    }
+  Future<void> signup(
+      String email, String password, String fullName, String collegeId) async {
+    return _authenticate(email, password, 'signupNewUser', fullName, collegeId);
   }
 
-  Future<void> login(String email, String password, String fullName) async {
-    try {
-      return _authenticate(email, password, fullName, 'verifyPassword');
-    } catch (error) {
-      throw error;
-    }
+  Future<void> login(
+      String email, String password, String fullName, String collegeId) async {
+    return _authenticate(
+        email, password, 'verifyPassword', fullName, collegeId);
   }
 
   Future<bool> tryAutoLogin() async {

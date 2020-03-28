@@ -1,11 +1,13 @@
+import 'package:flutter/foundation.dart';
+
 class Classroom {
   String _name;
-  String _day;
+  int _weekDay;
   String _startTime;
   String _endTime;
 
   String get name => this._name;
-  String get day => this._day;
+  int get day => this._weekDay;
   String get startTime => this._startTime;
   String get endTime => this._endTime;
 
@@ -13,8 +15,8 @@ class Classroom {
     this._name = name;
   }
 
-  set day(String day) {
-    this._day = day;
+  set day(int day) {
+    this._weekDay = day;
   }
 
   set startTime(String startTime) {
@@ -22,6 +24,18 @@ class Classroom {
   }
 
   set endTime(String endTime) {
+    this._endTime = endTime;
+  }
+
+  Classroom({
+    @required String name,
+    @required int weekDay,
+    @required String startTime,
+    @required String endTime,
+  }) {
+    this._name = name;
+    this._weekDay = weekDay;
+    this._startTime = startTime;
     this._endTime = endTime;
   }
 }

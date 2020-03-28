@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:provider/provider.dart';
+import 'package:tuple/tuple.dart';
 
 import '../components/custom_dialog.dart';
 
@@ -8,8 +9,9 @@ import '../providers/auth.dart';
 
 import '../models/http_exception.dart';
 
-import '../utils/validators/email_validator.dart';
 import '../utils/validators/fullname_validator.dart';
+import '../utils/validators/college_id.dart';
+import '../utils/validators/email_validator.dart';
 import '../utils/validators/password_validator.dart';
 
 class AuthScreen extends StatelessWidget {
@@ -17,10 +19,12 @@ class AuthScreen extends StatelessWidget {
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final GlobalKey<FormFieldState> _nameKey = GlobalKey<FormFieldState>();
+  final GlobalKey<FormFieldState> _collegeIdKey = GlobalKey<FormFieldState>();
   final GlobalKey<FormFieldState> _emailKey = GlobalKey<FormFieldState>();
   final GlobalKey<FormFieldState> _passwordKey = GlobalKey<FormFieldState>();
 
   String _name;
+  String _collegeId;
   String _email;
   String _password;
 
@@ -57,15 +61,16 @@ class AuthScreen extends StatelessWidget {
             padding: EdgeInsets.symmetric(
               horizontal: 0.085 * sw,
             ),
-            child: Selector<Auth, bool>(
-              selector: (_, auth) => auth.isLogin,
-              builder: (_, isLogin, __) => Column(
+            child: Selector<Auth, Tuple2<bool, bool>>(
+              selector: (_, auth) =>
+                  Tuple2(auth.isLogin, auth.userType == UserType.student),
+              builder: (_, data, __) => Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: <Widget>[
                   AnimatedContainer(
                     padding: EdgeInsets.only(top: 0.10 * sh, bottom: 0.04 * sh),
                     duration: Duration(milliseconds: _animationDuration),
-                    height: isLogin ? 0.338 * sh : 0.256 * sh,
+                    height: data.item1 ? 0.338 * sh : 0.256 * sh,
                     child: Container(
                       padding: const EdgeInsets.all(5.0),
                       decoration: BoxDecoration(
@@ -73,10 +78,9 @@ class AuthScreen extends StatelessWidget {
                         color: Colors.white,
                         boxShadow: [
                           BoxShadow(
-                            spreadRadius: 5.0,
-                            blurRadius: 4.0,
-                            color: Theme.of(context).primaryColor
-                          ),
+                              spreadRadius: 5.0,
+                              blurRadius: 4.0,
+                              color: Theme.of(context).primaryColor),
                         ],
                       ),
                       child: Image.asset('assets/images/eng_asu_logo.png'),
@@ -84,7 +88,9 @@ class AuthScreen extends StatelessWidget {
                   ),
                   AnimatedContainer(
                     duration: Duration(milliseconds: _animationDuration),
-                    height: isLogin ? 0.350 * sh : 0.540 * sh,
+                    height: data.item1
+                        ? 0.350 * sh
+                        : !data.item2 ? 0.520 * sh : 0.580 * sh,
                     width: double.maxFinite,
                     padding: EdgeInsets.symmetric(
                       horizontal: 0.054 * sw,
@@ -111,10 +117,10 @@ class AuthScreen extends StatelessWidget {
                             mainAxisSize: MainAxisSize.min,
                             children: <Widget>[
                               Container(
-                                height: 0.048 * sh,
+                                height: 0.044 * sh,
                                 width: 0.300 * sw,
                                 child: FlatButton(
-                                  color: isLogin
+                                  color: data.item1
                                       ? Theme.of(context).primaryColor
                                       : Colors.white,
                                   shape: RoundedRectangleBorder(
@@ -134,7 +140,7 @@ class AuthScreen extends StatelessWidget {
                                         .textTheme
                                         .bodyText2
                                         .apply(
-                                          color: isLogin
+                                          color: data.item1
                                               ? Colors.white
                                               : Theme.of(context).primaryColor,
                                         ),
@@ -146,10 +152,10 @@ class AuthScreen extends StatelessWidget {
                                 ),
                               ),
                               Container(
-                                height: 0.048 * sh,
+                                height: 0.044 * sh,
                                 width: 0.300 * sw,
                                 child: FlatButton(
-                                  color: isLogin
+                                  color: data.item1
                                       ? Colors.white
                                       : Theme.of(context).primaryColor,
                                   shape: RoundedRectangleBorder(
@@ -169,7 +175,7 @@ class AuthScreen extends StatelessWidget {
                                         .textTheme
                                         .bodyText2
                                         .apply(
-                                          color: isLogin
+                                          color: data.item1
                                               ? Theme.of(context).primaryColor
                                               : Colors.white,
                                         ),
@@ -182,8 +188,87 @@ class AuthScreen extends StatelessWidget {
                               ),
                             ],
                           ),
+                          if (!data.item1)
+                            Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: <Widget>[
+                                Container(
+                                  height: 0.042 * sh,
+                                  width: 0.300 * sw,
+                                  child: FlatButton(
+                                    color: data.item2
+                                        ? Theme.of(context).primaryColor
+                                        : Colors.white,
+                                    shape: RoundedRectangleBorder(
+                                      side: BorderSide(
+                                        width: 1.0,
+                                        color: Theme.of(context).primaryColor,
+                                      ),
+                                      borderRadius: BorderRadius.only(
+                                        topLeft:
+                                            Radius.circular(0.046 * sh / 2),
+                                        bottomLeft:
+                                            Radius.circular(0.046 * sh / 2),
+                                      ),
+                                    ),
+                                    child: Text(
+                                      'Student',
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .bodyText2
+                                          .apply(
+                                            color: data.item2
+                                                ? Colors.white
+                                                : Theme.of(context)
+                                                    .primaryColor,
+                                          ),
+                                    ),
+                                    onPressed: () {
+                                      _staticAuthProvider.userType =
+                                          UserType.student;
+                                    },
+                                  ),
+                                ),
+                                Container(
+                                  height: 0.042 * sh,
+                                  width: 0.300 * sw,
+                                  child: FlatButton(
+                                    color: data.item2
+                                        ? Colors.white
+                                        : Theme.of(context).primaryColor,
+                                    shape: RoundedRectangleBorder(
+                                      side: BorderSide(
+                                        width: 1.0,
+                                        color: Theme.of(context).primaryColor,
+                                      ),
+                                      borderRadius: BorderRadius.only(
+                                        topRight:
+                                            Radius.circular(0.046 * sh / 2),
+                                        bottomRight:
+                                            Radius.circular(0.046 * sh / 2),
+                                      ),
+                                    ),
+                                    child: Text(
+                                      'Instructor',
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .bodyText2
+                                          .apply(
+                                            color: data.item2
+                                                ? Theme.of(context).primaryColor
+                                                : Colors.white,
+                                          ),
+                                    ),
+                                    onPressed: () {
+                                      _staticAuthProvider.userType =
+                                          UserType.instructor;
+                                    },
+                                  ),
+                                ),
+                              ],
+                            ),
                           ...[
-                            if (!isLogin)
+                            if (!data.item1)
                               TextFormField(
                                 key: _nameKey,
                                 keyboardType: TextInputType.text,
@@ -194,6 +279,19 @@ class AuthScreen extends StatelessWidget {
                                 validator: validateFullName,
                                 onSaved: (name) {
                                   _name = name;
+                                },
+                              ),
+                            if (!data.item1 && data.item2)
+                              TextFormField(
+                                key: _collegeIdKey,
+                                keyboardType: TextInputType.text,
+                                style: Theme.of(context).textTheme.headline3,
+                                decoration: InputDecoration(
+                                  labelText: 'College ID',
+                                ),
+                                validator: validateCollegeId,
+                                onSaved: (collegeId) {
+                                  _collegeId = collegeId;
                                 },
                               ),
                             TextFormField(
@@ -221,7 +319,7 @@ class AuthScreen extends StatelessWidget {
                                 _password = password;
                               },
                             ),
-                            if (!isLogin)
+                            if (!data.item1)
                               TextFormField(
                                 keyboardType: TextInputType.visiblePassword,
                                 obscureText: true,
@@ -240,7 +338,10 @@ class AuthScreen extends StatelessWidget {
                       ),
                     ),
                   ),
-                  SizedBox(height: 0.060 * sh),
+                  Expanded(
+                    flex: 3,
+                    child: Container(),
+                  ),
                   Selector<Auth, bool>(
                     selector: (_, auth) => auth.isLoading,
                     builder: (_, isLoading, __) => Stack(
@@ -253,7 +354,7 @@ class AuthScreen extends StatelessWidget {
                             color: Theme.of(context).primaryColor,
                             shape: StadiumBorder(),
                             child: Text(
-                              isLogin ? 'LOGIN' : 'SIGNUP',
+                              data.item1 ? 'LOGIN' : 'SIGNUP',
                               style: Theme.of(context)
                                   .textTheme
                                   .headline1
@@ -269,20 +370,20 @@ class AuthScreen extends StatelessWidget {
                                       _staticAuthProvider.isLoading = true;
 
                                       try {
-                                        if (isLogin) {
+                                        if (data.item1) {
                                           await _staticAuthProvider.login(
-                                              _email, _password, null);
-
-                                          /* Navigator.of(context)
-                                              .pushReplacementNamed(
-                                                  HomeScreen.routeName); */
+                                            _email,
+                                            _password,
+                                            null,
+                                            null,
+                                          );
                                         } else {
                                           await _staticAuthProvider.signup(
-                                              _email, _password, _name);
-
-                                          /* Navigator.of(context)
-                                              .pushReplacementNamed(
-                                                  WalkthroughScreen.routeName); */
+                                            _email,
+                                            _password,
+                                            _name,
+                                            _collegeId,
+                                          );
                                         }
                                       } on HttpException catch (error) {
                                         var errorMessage =
@@ -317,7 +418,7 @@ class AuthScreen extends StatelessWidget {
                                         _showErrorDialog(errorMessage);
                                       } catch (error) {
                                         var errorMessage =
-                                            'Could not ${isLogin ? 'log you in' : 'sign you up'}. Please try again later.';
+                                            'Could not ${data.item1 ? 'log you in' : 'sign you up'}. Please try again later.';
                                         _showErrorDialog(errorMessage);
                                       }
 
@@ -330,6 +431,7 @@ class AuthScreen extends StatelessWidget {
                       ],
                     ),
                   ),
+                  SizedBox(height: 0.060 * sh),
                 ],
               ),
             ),

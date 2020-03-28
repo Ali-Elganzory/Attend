@@ -1,3 +1,5 @@
+import 'package:flutter/foundation.dart';
+
 import '../utils/month_name.dart';
 
 class Date {
@@ -18,6 +20,16 @@ class Date {
   }
 
   set year(int year) {
+    this._year = year;
+  }
+
+  Date({
+    @required int day,
+    @required int month,
+    @required int year,
+  }) {
+    this._day = day;
+    this._month = month;
     this._year = year;
   }
 

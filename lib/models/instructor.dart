@@ -3,7 +3,7 @@ import './instructor_classroom.dart';
 
 class Instructor extends Person {
   String _title;
-  List<InstructorClassroom> _classrooms;
+  List<InstructorClassroom> _classrooms = [];
 
   String get title => this._title;
 
@@ -15,5 +15,9 @@ class Instructor extends Person {
 
   set classrooms(List<InstructorClassroom> classrooms) {
     this._classrooms = classrooms;
+  }
+
+  void addClassroom(Map<String, dynamic> classroom) {
+    _classrooms.add(InstructorClassroom.fromMap(classroom));
   }
 }
