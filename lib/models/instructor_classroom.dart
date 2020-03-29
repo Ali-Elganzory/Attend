@@ -28,11 +28,13 @@ class InstructorClassroom extends Classroom {
 
   factory InstructorClassroom.fromMap(Map<String, dynamic> classroom) {
     return InstructorClassroom(
-      name: classroom['name'],
-      weekDay: classroom['weekDay'],
-      startTime: classroom['startTime'],
-      endTime: classroom['endTime'],
-      students: (classroom['students'].values as List<Map<String, dynamic>>)
+      name: classroom['name'] ?? "",
+      weekDay: classroom['weekDay'] ?? 0,
+      startTime: classroom['startTime'] ?? "00:00",
+      endTime: classroom['endTime'] ?? "00:00",
+      students: (classroom['students'] == null
+              ? {}.values
+              : classroom['students'].values as List<Map<String, dynamic>>)
           .map((student) {
         return InstructorStudent.fromMap(student);
       }).toList(),

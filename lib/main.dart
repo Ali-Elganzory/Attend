@@ -6,10 +6,12 @@ import 'package:provider/provider.dart';
 import './utils/app_theme_data.dart';
 
 import './providers/auth.dart';
+import './providers/instructor_classrooms.dart';
 
 import './screens/splash_screen.dart';
 import './screens/auth_screen.dart';
 import './screens/home_screen.dart';
+import './screens/create_classroom_screen.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -32,15 +34,18 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Auth _staticAuthProvider;
-    return MaterialApp(
-      theme: appThemeData,
-      home: MultiProvider(
-        providers: [
-          ChangeNotifierProvider<Auth>(
-            create: (_) => Auth(),
-          )
-        ],
-        child: Selector<Auth, bool>(
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider<Auth>(
+          create: (_) => Auth(),
+        ),
+        ChangeNotifierProvider<InstructorClassrooms>(
+          create: (_) => InstructorClassrooms(),
+        ),
+      ],
+      child: MaterialApp(
+        theme: appThemeData,
+        home: Selector<Auth, bool>(
           selector: (_, auth) {
             _staticAuthProvider = auth;
             return auth.isAuth;
@@ -66,6 +71,9 @@ class MyApp extends StatelessWidget {
           },
           child: AuthScreen(),
         ),
+        routes: {
+          CreateClassroom.routeName: (_) => CreateClassroom(),
+        },
       ),
     );
   }

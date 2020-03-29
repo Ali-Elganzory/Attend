@@ -117,3 +117,15 @@ class CustomDialog extends StatelessWidget {
     );
   }
 }
+
+showErrorDialog(BuildContext context, String errorMessage) {
+  showDialog(
+    context: context,
+    builder: (ctx) => CustomDialog(
+      title: "Something went wrong..",
+      description: errorMessage,
+      positiveButtonText: null,
+      negativeButtonText: "Okay",
+    ),
+  );
+}

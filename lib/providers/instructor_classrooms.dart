@@ -10,49 +10,86 @@ import '../models/instructor.dart';
 class InstructorClassrooms extends Instructor with ChangeNotifier {
   String _userId;
 
+  bool _classroomsLoading = false;
+  bool _createClassroomLoading = false;
+
   Firestore _firestore = Firestore.instance;
 
-  Future<bool> getUserId() async {
+  Future<void> getUserIdAndNameAndEmail() async {
     final prefs = await SharedPreferences.getInstance();
     final extractedUserData =
         json.decode(prefs.getString('userData')) as Map<String, Object>;
     _userId = extractedUserData['userId'];
 
-    if (_userId != null) {
-      return true;
-    } else {
-      return false;
-    }
+    DocumentSnapshot instructor =
+        await _firestore.collection('instructors').document(_userId).get();
+    this.name = instructor['fullName'];
+    this.email = instructor['email'];
   }
 
-  Future<String> fetchClassrooms() {
-    _firestore
+  bool get classroomsLoading => this._classroomsLoading;
+
+  set classroomsLoading(bool b) {
+    this._classroomsLoading = b;
+    notifyListeners();
+  }
+
+  bool get createClassroomLoading => this._createClassroomLoading;
+
+  set createClassroomLoading(bool b) {
+    this._createClassroomLoading = b;
+    notifyListeners();
+  }
+
+  Future<void> fetchClassrooms() async {
+    classroomsLoading = true;
+
+    QuerySnapshot classrooms = await _firestore
         .collection('classrooms')
         .where('owner', isEqualTo: _userId)
-        .snapshots()
-        .listen((event) {
-      event.documents.forEach((classroom) {
-        super.addClassroom(classroom.data);
+        .getDocuments();
+
+    for (var classroom in classrooms.documents) {
+      Map<String, dynamic> students = {};
+      (await _firestore
+              .collection('classrooms')
+              .document(classroom.documentID)
+              .collection('students')
+              .getDocuments())
+          .documents
+          .forEach((studentDocument) {
+        students.putIfAbsent(
+            studentDocument.documentID, () => studentDocument.data);
       });
 
-      notifyListeners();
-    });
+      classroom.data.putIfAbsent('students', () => students);
+
+      super.addClassroom(classroom.data);
+    }
+
+    classroomsLoading = false;
   }
 
-  Future<String> addOnlineClassroom({
+  Future<void> createClassroom({
     @required String name,
     @required int weekDay,
     @required String startTime,
     @required String endTime,
-  }) {
-    _firestore.collection('classrooms').add({
+  }) async {
+    createClassroomLoading = true;
+
+    DocumentReference classroom =
+        await _firestore.collection('classrooms').add({
       'owner': _userId,
       'instructor': 'nnnnnnn',
       'name': name,
       'weekDay': weekDay,
       'startTime': startTime,
       'endTime': endTime,
-      'students': [],
     });
+
+    await this.fetchClassrooms();
+
+    createClassroomLoading = false;
   }
 }

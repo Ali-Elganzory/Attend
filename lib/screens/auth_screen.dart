@@ -10,7 +10,7 @@ import '../providers/auth.dart';
 import '../models/http_exception.dart';
 
 import '../utils/validators/fullname_validator.dart';
-import '../utils/validators/college_id.dart';
+import '../utils/validators/college_id_validator.dart';
 import '../utils/validators/email_validator.dart';
 import '../utils/validators/password_validator.dart';
 
@@ -37,18 +37,6 @@ class AuthScreen extends StatelessWidget {
 
     Auth _staticAuthProvider = Provider.of<Auth>(context);
 
-    _showErrorDialog(String errorMessage) {
-      showDialog(
-        context: context,
-        builder: (ctx) => CustomDialog(
-          title: "Something went wrong..",
-          description: errorMessage,
-          positiveButtonText: null,
-          negativeButtonText: "Okay",
-        ),
-      );
-    }
-
     return Scaffold(
       // resizeToAvoidBottomInset: false,
       body: SingleChildScrollView(
@@ -63,7 +51,7 @@ class AuthScreen extends StatelessWidget {
             ),
             child: Selector<Auth, Tuple2<bool, bool>>(
               selector: (_, auth) =>
-                  Tuple2(auth.isLogin, auth.userType == UserType.student),
+                  Tuple2(auth.isLogin, auth.userType == UserType.students),
               builder: (_, data, __) => Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: <Widget>[
@@ -225,7 +213,7 @@ class AuthScreen extends StatelessWidget {
                                     ),
                                     onPressed: () {
                                       _staticAuthProvider.userType =
-                                          UserType.student;
+                                          UserType.students;
                                     },
                                   ),
                                 ),
@@ -261,7 +249,7 @@ class AuthScreen extends StatelessWidget {
                                     ),
                                     onPressed: () {
                                       _staticAuthProvider.userType =
-                                          UserType.instructor;
+                                          UserType.instructors;
                                     },
                                   ),
                                 ),
@@ -415,11 +403,11 @@ class AuthScreen extends StatelessWidget {
                                         } else {
                                           errorMessage = error.toString();
                                         }
-                                        _showErrorDialog(errorMessage);
+                                        showErrorDialog(context, errorMessage);
                                       } catch (error) {
                                         var errorMessage =
                                             'Could not ${data.item1 ? 'log you in' : 'sign you up'}. Please try again later.';
-                                        _showErrorDialog(errorMessage);
+                                        showErrorDialog(context, errorMessage);
                                       }
 
                                       _staticAuthProvider.isLoading = false;

@@ -3,17 +3,32 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 
-import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
-
-import '../models/http_exception.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 enum AuthMode { login, signup }
-enum UserType { student, instructor }
+enum UserType { students, instructors }
+
+extension on UserType {
+  String toShortString() {
+    return this.toString().split('.').last;
+  }
+}
 
 class Auth with ChangeNotifier {
+  FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
+  Firestore _firestore = Firestore.instance;
+
+  FirebaseUser _user;
+
+  String _token;
+  DateTime _expiryDate;
+  String _userId;
+  Timer _authTimer;
+
   AuthMode _authMode = AuthMode.login;
-  UserType _userType = UserType.student;
+  UserType _userType = UserType.students;
   bool _isLogin = true;
   bool _isLoading = false;
 
@@ -36,8 +51,14 @@ class Auth with ChangeNotifier {
     notifyListeners();
   }
 
-  String _userTypeUrl() {
-    return this._userType == UserType.student ? "students" : "instructors";
+  set userTypeFromString(String userType) {
+    this._userType =
+        userType == 'students' ? UserType.students : UserType.instructors;
+    notifyListeners();
+  }
+
+  String _userTypeCollection() {
+    return this._userType == UserType.students ? "students" : "instructors";
   }
 
   bool get isLogin {
@@ -52,11 +73,6 @@ class Auth with ChangeNotifier {
   bool get isLoading {
     return this._isLoading;
   }
-
-  String _token;
-  DateTime _expiryDate;
-  String _userId;
-  Timer _authTimer;
 
   bool get isAuth {
     return token != null;
@@ -75,108 +91,66 @@ class Auth with ChangeNotifier {
     return _userId;
   }
 
-  Future<void> _authenticate(String email, String password, String urlSegment,
+  Future<void> _authenticate(String email, String password, String operation,
       String fullName, String collegeId) async {
-    String url =
-        'https://www.googleapis.com/identitytoolkit/v3/relyingparty/$urlSegment?key=AIzaSyB7yt-GQMFt4oEVzLYSZpdpcaH7VPyqfgU';
-    try {
-      http.Response response = await http.post(
-        url,
-        body: json.encode(
-          {
-            'email': email,
-            'password': password,
-            'returnSecureToken': true,
-          },
-        ),
-      );
-      final responseData = json.decode(response.body);
-      if (responseData['error'] != null) {
-        throw HttpException(responseData['error']['message']);
-      }
+    //  Sign up
+    if (operation == "signup") {
+      _user = (await _firebaseAuth.createUserWithEmailAndPassword(
+              email: email, password: password))
+          .user;
 
-      notifyListeners();
-
-      _token = responseData['idToken'];
-      _userId = responseData['localId'];
-      _expiryDate = DateTime.now().add(
-        Duration(
-          seconds: int.parse(
-            responseData['expiresIn'],
-          ),
-        ),
-      );
-      _autoLogout();
-
-      if (urlSegment == 'signupNewUser') {
-        url =
-            'https://firestore.googleapis.com/v1/projects/attend-1a9b5/databases/(default)/documents/users/$userId';
-
-        response = await http.patch(url,
-            headers: {"Authorization": 'Bearer $token'},
-            body: json.encode({
-              "fields": {
-                'userType': {
-                  'stringValue':
-                      userType == UserType.student ? "students" : "instructors"
-                },
-              }
-            }));
-
-        url =
-            'https://firestore.googleapis.com/v1/projects/attend-1a9b5/databases/(default)/documents/${_userTypeUrl()}/$userId';
-
-        response = await http.patch(url,
-            headers: {"Authorization": 'Bearer $token'},
-            body: json.encode({
-              "fields": {
-                'fullName': {'stringValue': fullName},
-                'email': {'stringValue': email},
-                if (userType == UserType.student)
-                  'collegeId': {'nullValue': collegeId},
-              }
-            }));
-        final responseData = json.decode(response.body);
-        if (responseData['error'] != null) {
-          throw HttpException(responseData['error']['message']);
-        }
-      }
-
-      url =
-          'https://firestore.googleapis.com/v1/projects/attend-1a9b5/databases/(default)/documents/users/$userId';
-
-      response = await http.get(
-        url,
-        headers: {"Authorization": 'Bearer $token'},
-      );
-
-      notifyListeners();
-      final prefs = await SharedPreferences.getInstance();
-      final userData = json.encode(
-        {
-          'token': _token,
-          'userId': _userId,
-          'expiryDate': _expiryDate.toIso8601String(),
-          'userType': (json.decode(response.body)['fields']['userType'] as Map)
-              .values
-              .toList()[0],
-        },
-      );
-      prefs.setString('userData', userData);
-    } catch (error) {
-      throw error;
+      //  Set user's type in firestore -> Collection('users')
+      _firestore.collection(_userTypeCollection()).document(userId).setData({
+        'fullName': fullName,
+        'email': email,
+        if (userType == UserType.students) 'collegeId': collegeId
+      });
     }
+    //  Sign in
+    else {
+      _user = (await _firebaseAuth.signInWithEmailAndPassword(
+              email: email, password: password))
+          .user;
+    }
+
+    //  Extract user's Token
+    IdTokenResult idTokenResult = (await _user.getIdToken());
+    _token = idTokenResult.token;
+    _userId = _user.uid;
+    _expiryDate = idTokenResult.expirationTime;
+    _autoLogout();
+
+    //  Fetch user's type from firestore
+    _firestore
+        .collection('users')
+        .document(userId)
+        .setData({'userType': userType.toShortString()});
+
+    userTypeFromString =
+        (await _firestore.collection('users').document(userId).get())
+            .data['userType'];
+
+    //  Save user's session in sharedpreferences == local storage
+    final prefs = await SharedPreferences.getInstance();
+    final userData = json.encode(
+      {
+        'token': _token,
+        'userId': _userId,
+        'expiryDate': _expiryDate.toIso8601String(),
+        'userType': userType.toShortString(),
+      },
+    );
+    prefs.setString('userData', userData);
   }
 
   Future<void> signup(
       String email, String password, String fullName, String collegeId) async {
-    return _authenticate(email, password, 'signupNewUser', fullName, collegeId);
+    return _authenticate(email, password, 'signup', fullName, collegeId);
   }
 
   Future<void> login(
       String email, String password, String fullName, String collegeId) async {
-    return _authenticate(
-        email, password, 'verifyPassword', fullName, collegeId);
+    return _authenticate(email, password, 'signin', fullName, collegeId);
   }
 
   Future<bool> tryAutoLogin() async {
@@ -184,6 +158,7 @@ class Auth with ChangeNotifier {
     if (!prefs.containsKey('userData')) {
       return false;
     }
+
     final extractedUserData =
         json.decode(prefs.getString('userData')) as Map<String, Object>;
     final expiryDate = DateTime.parse(extractedUserData['expiryDate']);
@@ -191,6 +166,7 @@ class Auth with ChangeNotifier {
     if (expiryDate.isBefore(DateTime.now())) {
       return false;
     }
+
     _token = extractedUserData['token'];
     _userId = extractedUserData['userId'];
     _expiryDate = expiryDate;
