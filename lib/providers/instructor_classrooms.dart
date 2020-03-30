@@ -81,13 +81,15 @@ class InstructorClassrooms extends Instructor with ChangeNotifier {
     DocumentReference classroom =
         await _firestore.collection('classrooms').add({
       'owner': _userId,
-      'instructor': 'nnnnnnn',
+      'instructorName': 'nnnnnnn',
+      'instructorEmail': email,
       'name': name,
       'weekDay': weekDay,
       'startTime': startTime,
       'endTime': endTime,
     });
 
+    this.classrooms = [];
     await this.fetchClassrooms();
 
     createClassroomLoading = false;

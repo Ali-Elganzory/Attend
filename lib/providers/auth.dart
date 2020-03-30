@@ -98,13 +98,6 @@ class Auth with ChangeNotifier {
       _user = (await _firebaseAuth.createUserWithEmailAndPassword(
               email: email, password: password))
           .user;
-
-      //  Set user's type in firestore -> Collection('users')
-      _firestore.collection(_userTypeCollection()).document(userId).setData({
-        'fullName': fullName,
-        'email': email,
-        if (userType == UserType.students) 'collegeId': collegeId
-      });
     }
     //  Sign in
     else {
@@ -120,6 +113,16 @@ class Auth with ChangeNotifier {
     _expiryDate = idTokenResult.expirationTime;
     _autoLogout();
 
+    if (operation == "signup") {
+      //  Set user's type in firestore -> Collection('users')
+      _firestore.collection(_userTypeCollection()).document(_userId).setData({
+        'fullName': fullName,
+        'email': email,
+        if (userType == UserType.students) 'collegeId': collegeId,
+        if (userType == UserType.students) 'classrooms': [],
+      });
+    }
+
     //  Fetch user's type from firestore
     _firestore
         .collection('users')
@@ -127,7 +130,7 @@ class Auth with ChangeNotifier {
         .setData({'userType': userType.toShortString()});
 
     userTypeFromString =
-        (await _firestore.collection('users').document(userId).get())
+        (await _firestore.collection('users').document(_userId).get())
             .data['userType'];
 
     //  Save user's session in sharedpreferences == local storage

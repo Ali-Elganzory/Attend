@@ -7,11 +7,14 @@ import './utils/app_theme_data.dart';
 
 import './providers/auth.dart';
 import './providers/instructor_classrooms.dart';
+import './providers/student_classrooms.dart';
 
 import './screens/splash_screen.dart';
 import './screens/auth_screen.dart';
-import './screens/home_screen.dart';
+import './screens/instructor_classrooms_screen.dart';
 import './screens/create_classroom_screen.dart';
+import './screens/student_classrooms_screen.dart';
+import './screens/join_classroom_screen.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -42,6 +45,9 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider<InstructorClassrooms>(
           create: (_) => InstructorClassrooms(),
         ),
+        ChangeNotifierProvider<StudentClassrooms>(
+          create: (_) => StudentClassrooms(),
+        ),
       ],
       child: MaterialApp(
         theme: appThemeData,
@@ -51,15 +57,21 @@ class MyApp extends StatelessWidget {
             return auth.isAuth;
           },
           builder: (_, isAuth, __) {
+            bool isStudent = _staticAuthProvider.userType == UserType.students;
+
             return isAuth
-                ? HomeScreen()
+                ? isStudent
+                    ? StudentClassroomsScreen()
+                    : InstructorClassroomsScreen()
                 : FutureBuilder(
                     future: _staticAuthProvider.tryAutoLogin(),
                     builder: (_, authResultSnapshot) {
                       if (authResultSnapshot.connectionState ==
                           ConnectionState.done) {
                         if (authResultSnapshot.data) {
-                          return HomeScreen();
+                          return isStudent
+                              ? StudentClassroomsScreen()
+                              : InstructorClassroomsScreen();
                         } else {
                           return AuthScreen();
                         }
@@ -72,7 +84,8 @@ class MyApp extends StatelessWidget {
           child: AuthScreen(),
         ),
         routes: {
-          CreateClassroom.routeName: (_) => CreateClassroom(),
+          CreateClassroomScreen.routeName: (_) => CreateClassroomScreen(),
+          JoinClassroomScreen.routeName: (_) => JoinClassroomScreen(),
         },
       ),
     );

@@ -8,12 +8,14 @@ import '../models/instructor_classroom.dart';
 
 import './create_classroom_screen.dart';
 
-class HomeScreen extends StatefulWidget {
+class InstructorClassroomsScreen extends StatefulWidget {
   @override
-  _HomeScreenState createState() => _HomeScreenState();
+  _InstructorClassroomsScreenState createState() =>
+      _InstructorClassroomsScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _InstructorClassroomsScreenState
+    extends State<InstructorClassroomsScreen> {
   @override
   void initState() {
     super.initState();
@@ -48,7 +50,7 @@ class _HomeScreenState extends State<HomeScreen> {
               color: Color(0xCC000000),
             ),
             onPressed: () {
-              Navigator.of(context).pushNamed(CreateClassroom.routeName);
+              Navigator.of(context).pushNamed(CreateClassroomScreen.routeName);
             },
           ),
           IconButton(

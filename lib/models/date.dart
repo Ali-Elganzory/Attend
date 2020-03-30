@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart';
 
-import '../utils/month_name.dart';
+import '../utils/constants/month_name.dart';
 
 class Date {
   int _day;
@@ -31,6 +31,14 @@ class Date {
     this._day = day;
     this._month = month;
     this._year = year;
+  }
+
+  factory Date.fromMap(Map<String, dynamic> date) {
+    return Date(
+      day: date['day'] ?? 0,
+      month: date['month'] ?? 0,
+      year: date['year'] ?? 2000,
+    );
   }
 
   String toString() {

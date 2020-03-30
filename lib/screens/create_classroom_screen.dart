@@ -6,21 +6,21 @@ import '../providers/instructor_classrooms.dart';
 
 import '../components/custom_dialog.dart';
 
-import '../utils/week_day.dart';
+import '../utils/constants/week_day.dart';
 import '../utils/validators/classroom_name_validator.dart';
 import '../utils/validators/hours_validator.dart';
 import '../utils/validators/minutes_validator.dart';
 
-class CreateClassroom extends StatefulWidget {
+class CreateClassroomScreen extends StatefulWidget {
   static const routeName = '/createClassroom';
 
-  CreateClassroom({Key key}) : super(key: key);
+  CreateClassroomScreen({Key key}) : super(key: key);
 
   @override
-  _CreateClassroomState createState() => _CreateClassroomState();
+  _CreateClassroomScreenState createState() => _CreateClassroomScreenState();
 }
 
-class _CreateClassroomState extends State<CreateClassroom> {
+class _CreateClassroomScreenState extends State<CreateClassroomScreen> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   final GlobalKey<FormFieldState> _nameKey = GlobalKey<FormFieldState>();
