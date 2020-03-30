@@ -4,13 +4,13 @@ import './person.dart';
 import './date.dart';
 
 class InstructorStudent extends Person {
-  String _id;
+  String _collegeId;
   List<Date> _sessions;
 
-  String get id => this._id;
+  String get collegeId => this._collegeId;
 
-  set id(String id) {
-    this._id = id;
+  set collegeId(String collegeId) {
+    this._collegeId = collegeId;
   }
 
   List<Date> get sessions => this._sessions;
@@ -19,14 +19,15 @@ class InstructorStudent extends Person {
     this._sessions = sessions;
   }
 
-  InstructorStudent({@required String id, @required List<Date> sessions}) {
-    this._id = id;
+  InstructorStudent(
+      {@required String collegeId, @required List<Date> sessions}) {
+    this._collegeId = collegeId;
     this._sessions = sessions;
   }
 
   factory InstructorStudent.fromMap(Map<String, dynamic> student) {
     return InstructorStudent(
-        id: student['collegeId'],
+        collegeId: student['collegeId'],
         sessions: (student['sessions'].values as List<Map<String, dynamic>>)
             .map((session) {
           return Date(

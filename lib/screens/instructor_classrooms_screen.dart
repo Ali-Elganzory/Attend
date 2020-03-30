@@ -7,6 +7,7 @@ import '../providers/instructor_classrooms.dart';
 import '../models/instructor_classroom.dart';
 
 import './create_classroom_screen.dart';
+import './instructor_classroom_details/instructor_classroom_details_screen.dart';
 
 class InstructorClassroomsScreen extends StatefulWidget {
   @override
@@ -82,55 +83,64 @@ class _InstructorClassroomsScreenState
               padding: EdgeInsets.all(0.04 * sw),
               itemCount: _classrooms.length,
               itemBuilder: (_, index) {
-                return AspectRatio(
-                  aspectRatio: 2.5 / 1.0,
-                  child: Container(
-                    width: double.maxFinite,
-                    clipBehavior: Clip.antiAlias,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(9.0),
-                      image: DecorationImage(
-                        fit: BoxFit.cover,
-                        image: AssetImage('assets/images/classroom_cover.jpg'),
+                return InkWell(
+                  onTap: () {
+                    Navigator.of(context).pushNamed(
+                      InstructorClassroomDetailsScreen.routName,
+                      arguments: _classrooms[index],
+                    );
+                  },
+                  child: AspectRatio(
+                    aspectRatio: 2.5 / 1.0,
+                    child: Container(
+                      width: double.maxFinite,
+                      clipBehavior: Clip.antiAlias,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(9.0),
+                        image: DecorationImage(
+                          fit: BoxFit.cover,
+                          image:
+                              AssetImage('assets/images/classroom_cover.jpg'),
+                        ),
                       ),
-                    ),
-                    child: Stack(
-                      children: <Widget>[
-                        Positioned(
-                          top: 18.0,
-                          left: 14.0,
-                          child: Text(
-                            _classrooms[index].name,
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 20.0,
-                            ),
-                            overflow: TextOverflow.ellipsis,
-                            maxLines: 1,
-                          ),
-                        ),
-                        Positioned(
-                          bottom: 12.0,
-                          left: 14.0,
-                          child: Text(
-                            '${_classrooms[index].students.length} students',
-                            style: TextStyle(
-                              color: Colors.white,
+                      child: Stack(
+                        children: <Widget>[
+                          Positioned(
+                            top: 18.0,
+                            left: 14.0,
+                            child: Text(
+                              _classrooms[index].name,
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 20.0,
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
                             ),
                           ),
-                        ),
-                        Positioned(
-                          top: 10.0,
-                          right: 0.0,
-                          child: IconButton(
-                            icon: Icon(
-                              Icons.more_vert,
-                              color: Colors.white,
+                          Positioned(
+                            bottom: 12.0,
+                            left: 14.0,
+                            child: Text(
+                              '${_classrooms[index].students.length} students',
+                              style: TextStyle(
+                                color: Colors.white,
+                              ),
                             ),
-                            onPressed: () {},
                           ),
-                        ),
-                      ],
+                          Positioned(
+                            top: 10.0,
+                            right: 0.0,
+                            child: IconButton(
+                              icon: Icon(
+                                Icons.more_vert,
+                                color: Colors.white,
+                              ),
+                              onPressed: () {},
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 );

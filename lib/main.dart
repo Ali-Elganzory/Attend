@@ -15,6 +15,7 @@ import './screens/instructor_classrooms_screen.dart';
 import './screens/create_classroom_screen.dart';
 import './screens/student_classrooms_screen.dart';
 import './screens/join_classroom_screen.dart';
+import './screens/instructor_classroom_details/instructor_classroom_details_screen.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -86,6 +87,15 @@ class MyApp extends StatelessWidget {
         routes: {
           CreateClassroomScreen.routeName: (_) => CreateClassroomScreen(),
           JoinClassroomScreen.routeName: (_) => JoinClassroomScreen(),
+        },
+        onGenerateRoute: (settings) {
+          if (settings.name == InstructorClassroomDetailsScreen.routName) {
+            return MaterialPageRoute(
+              builder: (context) => InstructorClassroomDetailsScreen(
+                classroom: settings.arguments,
+              ),
+            );
+          }
         },
       ),
     );
