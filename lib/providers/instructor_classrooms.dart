@@ -6,6 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../models/instructor.dart';
+import '../models/date.dart';
 
 class InstructorClassrooms extends Instructor with ChangeNotifier {
   String _userId;
@@ -49,6 +50,8 @@ class InstructorClassrooms extends Instructor with ChangeNotifier {
         .where('owner', isEqualTo: _userId)
         .getDocuments();
 
+    this.classrooms = [];
+
     for (var classroom in classrooms.documents) {
       Map<String, dynamic> students = {};
       (await _firestore
@@ -62,9 +65,11 @@ class InstructorClassrooms extends Instructor with ChangeNotifier {
             studentDocument.documentID, () => studentDocument.data);
       });
 
-      classroom.data.putIfAbsent('students', () => students);
+      Map<String, dynamic> data = classroom.data;
+      data.putIfAbsent('students', () => students);
+      print('${data['students']}, 0');
 
-      super.addClassroom(classroom.data);
+      super.addClassroom(data);
     }
 
     classroomsLoading = false;
@@ -80,8 +85,9 @@ class InstructorClassrooms extends Instructor with ChangeNotifier {
 
     DocumentReference classroom =
         await _firestore.collection('classrooms').add({
+      'createdAt': Date.fromDateTime(DateTime.now()).toMap(),
       'owner': _userId,
-      'instructorName': 'nnnnnnn',
+      'instructorName': this.name,
       'instructorEmail': email,
       'name': name,
       'weekDay': weekDay,
@@ -89,7 +95,6 @@ class InstructorClassrooms extends Instructor with ChangeNotifier {
       'endTime': endTime,
     });
 
-    this.classrooms = [];
     await this.fetchClassrooms();
 
     createClassroomLoading = false;

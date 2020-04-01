@@ -1,18 +1,30 @@
 import 'package:flutter/foundation.dart';
 
+import './date.dart';
+
 class Classroom {
   String _name;
+  Date _createdAt;
   int _weekDay;
   String _startTime;
   String _endTime;
 
   String get name => this._name;
-  int get day => this._weekDay;
+  Date get createdAt => this._createdAt;
+  int get weekDay => this._weekDay;
   String get startTime => this._startTime;
   String get endTime => this._endTime;
 
   set name(String name) {
     this._name = name;
+  }
+
+  set createdAt(Date createdAt) {
+    this._createdAt = createdAt;
+  }
+
+  set weekDay(int weekDay) {
+    this._weekDay = weekDay;
   }
 
   set day(int day) {
@@ -29,11 +41,13 @@ class Classroom {
 
   Classroom({
     @required String name,
+    @required Date createdAt,
     @required int weekDay,
     @required String startTime,
     @required String endTime,
   }) {
     this._name = name;
+    this._createdAt = createdAt;
     this._weekDay = weekDay;
     this._startTime = startTime;
     this._endTime = endTime;

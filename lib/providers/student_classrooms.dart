@@ -48,6 +48,8 @@ class StudentClassrooms extends Student with ChangeNotifier {
   Future<void> fetchClassrooms() async {
     classroomsLoading = true;
 
+    this.classrooms = [];
+
     for (var classroomReference in _classroomsReferences) {
       Map<String, dynamic> classroom = (await _firestore
               .collection('classrooms')
@@ -114,7 +116,6 @@ class StudentClassrooms extends Student with ChangeNotifier {
     });
 
     await this.getUserIdAndNameAndEmailAndClassroomsReferences();
-    this.classrooms = [];
     await this.fetchClassrooms();
 
     joinClassroomLoading = false;
@@ -122,6 +123,18 @@ class StudentClassrooms extends Student with ChangeNotifier {
 
   Future<void> attend(String classroomCode) async {
     DateTime now = DateTime.now();
+
+    await _firestore
+        .collection('classrooms')
+        .document(classroomCode)
+        .collection('students')
+        .document(_userId)
+        .updateData(
+      {
+        'lastDateAttended':
+            Date(day: now.day, month: now.month, year: now.year),
+      },
+    );
 
     await _firestore
         .collection('classrooms')

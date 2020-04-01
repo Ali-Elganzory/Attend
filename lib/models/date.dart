@@ -41,6 +41,96 @@ class Date {
     );
   }
 
+  factory Date.fromDateTime(DateTime date) {
+    return Date(
+      day: date.day ?? 0,
+      month: date.month ?? 0,
+      year: date.year ?? 2000,
+    );
+  }
+
+  int compare(Date date) {
+    if (this._year < date.year)
+      return -1;
+    else if (this._year > date.year)
+      return 1;
+    else {
+      if (this._month < date.month)
+        return -1;
+      else if (this._month > date.month)
+        return 1;
+      else {
+        if (this._day < date.day)
+          return -1;
+        else if (this._day > date.day)
+          return 1;
+        else
+          return 0;
+      }
+    }
+  }
+
+  bool before(Date date) {
+    return compare(date) == -1;
+  }
+
+  bool same(Date date) {
+    return compare(date) == 01;
+  }
+
+  bool after(Date date) {
+    return compare(date) == 1;
+  }
+
+  int compareDateTime(DateTime date) {
+    if (this._year < date.year)
+      return -1;
+    else if (this._year > date.year)
+      return 1;
+    else {
+      if (this._month < date.month)
+        return -1;
+      else if (this._month > date.month)
+        return 1;
+      else {
+        if (this._day < date.day)
+          return -1;
+        else if (this._day > date.day)
+          return 1;
+        else
+          return 0;
+      }
+    }
+  }
+
+  bool beforeDateTime(DateTime date) {
+    return compareDateTime(date) == -1;
+  }
+
+  bool sameDateTime(DateTime date) {
+    return compareDateTime(date) == 01;
+  }
+
+  bool afterDateTime(DateTime date) {
+    return compareDateTime(date) == 1;
+  }
+
+  DateTime toDateTime() {
+    return DateTime(
+      this._year ?? 2000,
+      this._month ?? 0,
+      this._day ?? 0,
+    );
+  }
+
+  Map<String, int> toMap() {
+    return {
+      'day': this._day ?? 0,
+      'month': this._month ?? 0,
+      'year': this._year ?? 2000,
+    };
+  }
+
   String toString() {
     return "${this._day} - ${this._month} - ${this._year}";
   }

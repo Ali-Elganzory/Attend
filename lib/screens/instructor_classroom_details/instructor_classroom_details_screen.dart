@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../utils/excel/create_excel.dart';
+
 import '../../models/instructor_classroom.dart';
 
 import './instructor_painter.dart';
@@ -33,8 +35,13 @@ class InstructorClassroomDetailsScreen extends StatelessWidget {
             left: 0.0,
             right: 0.0,
             height: 0.5 * sh,
-            child: CustomPaint(
-              painter: InstructorPainter(),
+            child: InkWell(
+              onTap: () {
+                exportClassroomToExcel(classroom);
+              },
+              child: CustomPaint(
+                painter: InstructorPainter(),
+              ),
             ),
           ),
         ],

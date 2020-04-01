@@ -19,22 +19,27 @@ class InstructorStudent extends Person {
     this._sessions = sessions;
   }
 
-  InstructorStudent(
-      {@required String collegeId, @required List<Date> sessions}) {
+  InstructorStudent({
+    @required String name,
+    @required String collegeId,
+    @required List<Date> sessions,
+  }) {
+    this.name = name;
     this._collegeId = collegeId;
     this._sessions = sessions;
   }
 
   factory InstructorStudent.fromMap(Map<String, dynamic> student) {
     return InstructorStudent(
-        collegeId: student['collegeId'],
-        sessions: (student['sessions'].values as List<Map<String, dynamic>>)
-            .map((session) {
-          return Date(
-            day: session['day'],
-            month: session['month'],
-            year: session['year'],
-          );
-        }).toList());
+      name: student['name'],
+      collegeId: student['collegeId'],
+      sessions: student['sessions'].map<Date>((session) {
+        return Date(
+          day: session['day'],
+          month: session['month'],
+          year: session['year'],
+        );
+      }).toList(),
+    );
   }
 }

@@ -115,6 +115,11 @@ class Auth with ChangeNotifier {
 
     if (operation == "signup") {
       //  Set user's type in firestore -> Collection('users')
+      _firestore
+          .collection('users')
+          .document(userId)
+          .setData({'userType': userType.toShortString()});
+
       _firestore.collection(_userTypeCollection()).document(_userId).setData({
         'fullName': fullName,
         'email': email,
@@ -124,10 +129,6 @@ class Auth with ChangeNotifier {
     }
 
     //  Fetch user's type from firestore
-    _firestore
-        .collection('users')
-        .document(userId)
-        .setData({'userType': userType.toShortString()});
 
     userTypeFromString =
         (await _firestore.collection('users').document(_userId).get())
@@ -173,6 +174,7 @@ class Auth with ChangeNotifier {
     _token = extractedUserData['token'];
     _userId = extractedUserData['userId'];
     _expiryDate = expiryDate;
+    userTypeFromString = extractedUserData['userType'];
     notifyListeners();
     _autoLogout();
     return true;

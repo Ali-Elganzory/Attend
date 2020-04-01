@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../providers/instructor_classrooms.dart';
+import '../providers/auth.dart';
 
 import '../models/instructor_classroom.dart';
 
@@ -39,7 +40,15 @@ class _InstructorClassroomsScreenState
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 1.5,
-        titleSpacing: 50.0,
+        leading: IconButton(
+          icon: Icon(
+            Icons.exit_to_app,
+            color: Color(0xCC000000),
+          ),
+          onPressed: () {
+            Provider.of<Auth>(context, listen: false).logout();
+          },
+        ),
         title: Text(
           'Attend ASU',
           style: TextStyle(color: Colors.black),
