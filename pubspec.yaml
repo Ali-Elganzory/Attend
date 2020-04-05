@@ -35,6 +35,7 @@ flutter:
   assets:
     - assets/images/eng_asu_logo.png
     - assets/images/classroom_cover.jpg
+    - assets/images/profile.png
 
   fonts:
     - family: Roboto
