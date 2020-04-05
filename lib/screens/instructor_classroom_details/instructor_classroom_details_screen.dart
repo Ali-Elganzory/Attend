@@ -42,17 +42,18 @@ class InstructorClassroomDetailsScreen extends StatelessWidget {
               child: DrawerHeader(
                   child: Column(
                     children: <Widget>[
-                      Container( 
-                          height: 100,
-                          width: 100,
-                          decoration: 
-                          BoxDecoration(shape: BoxShape.circle,
-                          color: Colors.white,
-                          image: DecorationImage(image: AssetImage('assets/images/profile.png',),fit:BoxFit.cover) ),
-                          ),
-                          Align(
-                            alignment: Alignment.bottomCenter,
-                            child: Text(name,style: TextStyle(color: Colors.white),))
+                      Padding(
+                        padding: const EdgeInsets.all(10.0),
+                        child: Container( 
+                            height: 100,
+                            width: 100,
+                            decoration: 
+                            BoxDecoration(shape: BoxShape.circle,
+                            color: Colors.white,
+                            image: DecorationImage(image: AssetImage('assets/images/profile.png',),fit:BoxFit.cover) ),
+                            ),
+                      ),
+                          Text(name,style: TextStyle(color: Colors.white),)
                     ],
                   ),
               ),
