@@ -43,8 +43,8 @@ class _InstructorBodyState extends State<InstructorBody> {
             child: ListTile(
               leading: CircleAvatar(
                 child: Text(students[index].number.toString(), style: TextStyle(color: Colors.white),),
-                backgroundColor: Colors.orange,),
-              title: Text(students[index].name,style: TextStyle(color: Colors.orange),),
+                backgroundColor: Color.fromRGBO(126, 185, 255, 1),),
+              title: Text(students[index].name,style: TextStyle(color: Colors.grey),),
             ) ,
            );
                     },
@@ -78,7 +78,7 @@ class _InstructorBodyState extends State<InstructorBody> {
           bottom: 0.15 * sh,
           left: 0.25 * sw,
           child: Container(
-            decoration: BoxDecoration(shape: BoxShape.circle,color: Colors.orange),
+            decoration: BoxDecoration(shape: BoxShape.circle,color: Color.fromRGBO(123, 112, 255, 1)),
             child: IconButton(
               iconSize: 33,
               icon: Icon(
@@ -97,7 +97,7 @@ class _InstructorBodyState extends State<InstructorBody> {
           right: 0.25 * sw,
           child: Container(
             
-            decoration: BoxDecoration(shape: BoxShape.circle, color: Colors.orange),
+            decoration: BoxDecoration(shape: BoxShape.circle, color: Color.fromRGBO(123, 112, 255, 1)),
             child: IconButton(
               iconSize: 33,
               icon: Icon(
@@ -125,7 +125,7 @@ class _InstructorBodyState extends State<InstructorBody> {
               enabled: enable,
               controller: counter,
               textAlign: TextAlign.center,
-              style: TextStyle(color: Colors.pink),
+              style: TextStyle(color: Color.fromRGBO(163 , 160, 185, 1)),
             ),
           ),
         ),

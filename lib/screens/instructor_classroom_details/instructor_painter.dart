@@ -19,11 +19,9 @@ class InstructorPainter extends CustomPainter {
       begin: Alignment.topLeft,
       end: Alignment.bottomRight,
       colors: [
-      Color.fromRGBO(204, 0, 102, 1),
-      Color.fromRGBO(255, 0, 127, 1),
-      Color.fromRGBO(204, 0, 102, 1),
-      Color.fromRGBO(255, 51, 153, 1),
-      Color.fromRGBO(204, 0, 102, 1)]
+      Color.fromRGBO(112, 252, 255, 1),
+       Color.fromRGBO(123, 112, 255, 1)
+      ]
     ).createShader(rect);
     canvas.drawPath(path, paint);
   }

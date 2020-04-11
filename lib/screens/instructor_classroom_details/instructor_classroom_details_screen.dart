@@ -43,7 +43,7 @@ class InstructorClassroomDetailsScreen extends StatelessWidget {
           behavior: HitTestBehavior.opaque,
           child: Theme(
             data: Theme.of(context)
-                .copyWith(canvasColor: Color.fromRGBO(255, 51, 51, 0.5)),
+                .copyWith(canvasColor:  Color.fromRGBO(123, 112, 255, 0.6)),
             child: Drawer(
               child: ListView(
                 padding: EdgeInsets.all(10),
@@ -110,7 +110,7 @@ class InstructorClassroomDetailsScreen extends StatelessWidget {
       ),
       appBar: AppBar(
       
-        backgroundColor: Colors.pink,
+        backgroundColor:  Color.fromRGBO(123, 112, 255, 1),
       ),
       body: InstructorBody()
     );
