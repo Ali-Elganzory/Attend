@@ -39,6 +39,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Auth _staticAuthProvider;
+
     return MultiProvider(
       providers: [
         ChangeNotifierProvider<Auth>(
@@ -83,7 +84,6 @@ class MyApp extends StatelessWidget {
                     },
                   );
           },
-          child: AuthScreen(),
         ),
         routes: {
           CreateClassroomScreen.routeName: (_) => CreateClassroomScreen(),
@@ -96,8 +96,7 @@ class MyApp extends StatelessWidget {
                 classroom: settings.arguments,
               ),
             );
-          }
-          else if (settings.name == StudentClassroomDetailsScreen.routName) {
+          } else if (settings.name == StudentClassroomDetailsScreen.routName) {
             return MaterialPageRoute(
               builder: (context) => StudentClassroomDetailsScreen(
                 classroom: settings.arguments,
