@@ -1,14 +1,14 @@
 import 'dart:ui';
 
 import 'package:attend/screens/instructor_classroom_details/instructor_body.dart';
+
 import 'package:flutter/material.dart';
+
 import 'studentInfo.dart';
 
 import '../../utils/excel/create_excel.dart';
 
 import '../../models/instructor_classroom.dart';
-
-import './instructor_painter.dart';
 
 class InstructorClassroomDetailsScreen extends StatelessWidget {
 

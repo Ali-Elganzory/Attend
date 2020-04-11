@@ -20,6 +20,14 @@ class _InstructorBodyState extends State<InstructorBody> {
     StudentInfo(number:23 ,name:'Ahmed',id:'18P7042'),
     StudentInfo(number:23 ,name:'Ahmed',id:'18P7042')
   ];
+  int numOfStudents=0;
+  bool enable = true;
+  void finalNumOfStudents(){
+    setState(() {
+      enable = false;
+    
+    });
+  }
   @override
   Widget build(BuildContext context) {
      Size size = MediaQuery.of(context).size;
@@ -27,17 +35,18 @@ class _InstructorBodyState extends State<InstructorBody> {
     double sw = size.width;
     final counter=TextEditingController();
     counter.text =0.toString();
-    bool enable = true;
+    
     return Container(
      child: Stack(
       alignment: Alignment.center,
       children: <Widget>[
       Column(
         children: <Widget>[
+          !enable?
       Container(
         height: sh*0.68,
         child: ListView.builder(
-        itemCount: students.length,
+        itemCount: numOfStudents,
         itemBuilder: (context,index){
           return Card(
             child: ListTile(
@@ -49,7 +58,7 @@ class _InstructorBodyState extends State<InstructorBody> {
            );
                     },
                       ),
-                  ),
+                  ):Container(height: sh*0.7),
           ],
         ),
         Positioned(
@@ -67,6 +76,7 @@ class _InstructorBodyState extends State<InstructorBody> {
           child: InkWell(
             onLongPress: null,
             onTap: () {
+              finalNumOfStudents();
               //exportClassroomToExcel(classroom);
             },
             child: CustomPaint(
@@ -80,15 +90,17 @@ class _InstructorBodyState extends State<InstructorBody> {
           child: Container(
             decoration: BoxDecoration(shape: BoxShape.circle,color: Color.fromRGBO(123, 112, 255, 1)),
             child: IconButton(
+              
               iconSize: 33,
               icon: Icon(
                 Icons.add,
                 color: Colors.white,
               ),
-              onPressed:  () {
+              onPressed:  enable?() {
                 counter.text = (int.parse(counter.text) + 1).toString();
+                numOfStudents++;
                 print(counter);
-              },
+              }:null,
             ),
           ),
         ),
@@ -99,6 +111,7 @@ class _InstructorBodyState extends State<InstructorBody> {
             
             decoration: BoxDecoration(shape: BoxShape.circle, color: Color.fromRGBO(123, 112, 255, 1)),
             child: IconButton(
+              
               iconSize: 33,
               icon: Icon(
                 Icons.remove,
@@ -106,10 +119,11 @@ class _InstructorBodyState extends State<InstructorBody> {
                 
               ),
               splashColor: Colors.grey,
-              onPressed:  () {
+              onPressed:  enable?() {
                 counter.text = (int.parse(counter.text) - 1).toString();
+                numOfStudents--;
                 print(counter);
-              },
+              }:null,
             ),
           ),
         ),
