@@ -75,7 +75,7 @@ class Date {
   }
 
   bool same(Date date) {
-    return compare(date) == 01;
+    return compare(date) == 0;
   }
 
   bool after(Date date) {
