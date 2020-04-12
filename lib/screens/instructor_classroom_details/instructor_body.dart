@@ -50,11 +50,11 @@ class _InstructorBodyState extends State<InstructorBody> {
         children: <Widget>[
           Column(
             children: <Widget>[
-              !enable
+              enable
                   ? Container(
                       height: sh * 0.68,
                       child: ListView.builder(
-                        itemCount: numOfStudents,
+                        itemCount: widget.classroom.students.length,
                         itemBuilder: (context, index) {
                           return Card(
                             child: ListTile(

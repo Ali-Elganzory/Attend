@@ -29,6 +29,14 @@ class StudentClassroomDetailsScreen extends StatelessWidget {
       int endTimeHour = int.tryParse(classroom.endTime.split(':')[0]) ?? 0;
       int endTimeMinute = int.tryParse(classroom.endTime.split(':')[1]) ?? 0;
 
+      print(
+          "${date.hour} ${startTimeHour} \n ${date.minute}  ${startTimeMinute} \n ${date.hour}  ${endTimeHour} \n ${date.minute}  ${endTimeMinute}");
+
+      print(date.hour >= startTimeHour &&
+          date.minute >= startTimeMinute &&
+          date.hour <= endTimeHour &&
+          date.minute <= endTimeMinute);
+
       return (date.hour >= startTimeHour &&
           date.minute >= startTimeMinute &&
           date.hour <= endTimeHour &&
