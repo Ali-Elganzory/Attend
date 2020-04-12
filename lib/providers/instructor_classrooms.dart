@@ -54,6 +54,9 @@ class InstructorClassrooms extends Instructor with ChangeNotifier {
 
     for (var classroom in classrooms.documents) {
       Map<String, dynamic> students = {};
+
+      classroom.data.putIfAbsent('id', () => classroom.documentID);
+
       (await _firestore
               .collection('classrooms')
               .document(classroom.documentID)
@@ -69,13 +72,15 @@ class InstructorClassrooms extends Instructor with ChangeNotifier {
       data.putIfAbsent('students', () => students);
       print('${data['students']}, 0');
 
-      super.addClassroom(data);
+      super.addClassroom(
+        data,
+      );
     }
 
     classroomsLoading = false;
   }
 
-  Future<void> createClassroom({
+  Future<String> createClassroom({
     @required String name,
     @required int weekDay,
     @required String startTime,
@@ -98,5 +103,7 @@ class InstructorClassrooms extends Instructor with ChangeNotifier {
     await this.fetchClassrooms();
 
     createClassroomLoading = false;
+
+    return classroom.documentID;
   }
 }

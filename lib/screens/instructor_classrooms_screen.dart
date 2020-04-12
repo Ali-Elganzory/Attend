@@ -7,6 +7,8 @@ import '../providers/auth.dart';
 
 import '../models/instructor_classroom.dart';
 
+import '../components/instructor_drawer.dart';
+
 import './create_classroom_screen.dart';
 import './instructor_classroom_details/instructor_classroom_details_screen.dart';
 
@@ -37,27 +39,16 @@ class _InstructorClassroomsScreenState
     double sw = screenSize.width;
 
     return Scaffold(
+      drawer: InstructorDrawer(),
       appBar: AppBar(
-        backgroundColor: Colors.white,
         elevation: 1.5,
-        leading: IconButton(
-          icon: Icon(
-            Icons.exit_to_app,
-            color: Color(0xCC000000),
-          ),
-          onPressed: () {
-            Provider.of<Auth>(context, listen: false).logout();
-          },
-        ),
         title: Text(
           'Attend ASU',
-          style: TextStyle(color: Colors.black),
         ),
         actions: <Widget>[
           IconButton(
             icon: Icon(
               Icons.add,
-              color: Color(0xCC000000),
             ),
             onPressed: () {
               Navigator.of(context).pushNamed(CreateClassroomScreen.routeName);
@@ -66,7 +57,6 @@ class _InstructorClassroomsScreenState
           IconButton(
             icon: Icon(
               Icons.more_vert,
-              color: Color(0xCC000000),
             ),
             onPressed: () {},
           ),

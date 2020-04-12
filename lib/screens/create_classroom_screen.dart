@@ -99,9 +99,11 @@ class _CreateClassroomScreenState extends State<CreateClassroomScreen> {
                               _formKey.currentState.save();
 
                               try {
-                                await Provider.of<InstructorClassrooms>(context,
-                                        listen: false)
-                                    .createClassroom(
+                                String classCode =
+                                    await Provider.of<InstructorClassrooms>(
+                                            context,
+                                            listen: false)
+                                        .createClassroom(
                                   name: this._name,
                                   weekDay: weekDayIndex[this._weekDay],
                                   startTime:
@@ -111,6 +113,16 @@ class _CreateClassroomScreenState extends State<CreateClassroomScreen> {
                                 );
 
                                 Navigator.pop(context);
+
+                                showDialog(
+                                  context: context,
+                                  builder: (ctx) => CustomDialog(
+                                    title: "The classroom code:",
+                                    description: classCode,
+                                    positiveButtonText: null,
+                                    negativeButtonText: "Okay",
+                                  ),
+                                );
                               } catch (error) {
                                 Provider.of<InstructorClassrooms>(context,
                                         listen: false)

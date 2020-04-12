@@ -65,6 +65,7 @@ class StudentClassrooms extends Student with ChangeNotifier {
               .get())
           .data['sessions'];
 
+      classroom.putIfAbsent('id', () => classroomReference);
       classroom.putIfAbsent('sessions', () => sessions);
 
       super.addClassroom(classroom);

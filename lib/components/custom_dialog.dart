@@ -56,7 +56,7 @@ class CustomDialog extends StatelessWidget {
                   ),
                 ),
                 SizedBox(height: 16.0),
-                Text(
+                SelectableText(
                   description,
                   textAlign: TextAlign.center,
                   style: TextStyle(

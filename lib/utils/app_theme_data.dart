@@ -2,10 +2,11 @@ import 'package:flutter/material.dart';
 
 final appThemeData = ThemeData(
   //***    Main Colors    ***//
-  primaryColor: Colors.blue,
+  primaryColor: Color.fromRGBO(123, 112, 255, 1),
   primaryColorLight: const Color(0x44F73B6F),
   accentColor: Colors.blueAccent,
   scaffoldBackgroundColor: const Color(0xFFFFFFFF),
+  canvasColor: Color.fromRGBO(123, 112, 255, 0.6),
 
   //***    Text    ***//
   textTheme: TextTheme(

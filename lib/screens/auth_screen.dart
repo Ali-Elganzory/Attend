@@ -59,19 +59,17 @@ class AuthScreen extends StatelessWidget {
                     padding: EdgeInsets.only(top: 0.10 * sh, bottom: 0.04 * sh),
                     duration: Duration(milliseconds: _animationDuration),
                     height: data.item1 ? 0.338 * sh : 0.256 * sh,
-                    child: Container(
-                      padding: const EdgeInsets.all(5.0),
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: Colors.white,
-                        boxShadow: [
-                          BoxShadow(
-                              spreadRadius: 5.0,
-                              blurRadius: 4.0,
-                              color: Theme.of(context).primaryColor),
-                        ],
+                    child: Card(
+                      shape: CircleBorder(),
+                      elevation: 9,
+                      child: Container(
+                        padding: const EdgeInsets.all(5.0),
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Colors.white,
+                        ),
+                        child: Image.asset('assets/images/eng_asu_logo.png'),
                       ),
-                      child: Image.asset('assets/images/eng_asu_logo.png'),
                     ),
                   ),
                   AnimatedContainer(
@@ -445,7 +443,17 @@ class AuthScreenBackground extends CustomPainter {
     firstWave.lineTo(sw, 0);
     firstWave.close();
 
-    paint.color = Colors.blueAccent;
+    var rect = Offset.zero & size;
+    paint.shader = LinearGradient(
+      begin: Alignment.topLeft,
+      end: Alignment.bottomRight,
+      colors: [
+        Color.fromRGBO(112, 210, 255, 1),
+        Color.fromRGBO(123, 112, 255, 1),
+        Color.fromRGBO(0, 0, 0, 0)
+      ],
+    ).createShader(rect);
+
     canvas.drawPath(firstWave, paint);
   }
 

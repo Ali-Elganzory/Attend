@@ -14,6 +14,7 @@ class InstructorClassroom extends Classroom {
   }
 
   InstructorClassroom({
+    @required String id,
     @required String name,
     @required Date createdAt,
     @required int weekDay,
@@ -21,6 +22,7 @@ class InstructorClassroom extends Classroom {
     @required String endTime,
     List<InstructorStudent> students,
   }) : super(
+            id: id,
             name: name,
             createdAt: createdAt,
             weekDay: weekDay,
@@ -32,6 +34,7 @@ class InstructorClassroom extends Classroom {
   factory InstructorClassroom.fromMap(Map<String, dynamic> classroom) {
     print(classroom['students']);
     return InstructorClassroom(
+      id: classroom['id'] ?? "",
       name: classroom['name'] ?? "",
       createdAt: classroom['createdAt'] == null
           ? Date.fromMap(classroom['createdAt'])
