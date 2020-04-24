@@ -7,6 +7,8 @@ import '../providers/auth.dart';
 
 import '../models/student_classroom.dart';
 
+import '../components/general_app_drawer.dart';
+
 import './join_classroom_screen.dart';
 import './student_classroom_details/student_classroom_details_screen.dart';
 
@@ -35,27 +37,18 @@ class _StudentClassroomsScreenState extends State<StudentClassroomsScreen> {
     double sw = screenSize.width;
 
     return Scaffold(
+      drawer: GeneralAppDrawer(
+        userType: "student",
+      ),
       appBar: AppBar(
-        backgroundColor: Colors.white,
         elevation: 1.5,
-        leading: IconButton(
-          icon: Icon(
-            Icons.exit_to_app,
-            color: Color(0xCC000000),
-          ),
-          onPressed: () {
-            Provider.of<Auth>(context, listen: false).logout();
-          },
-        ),
         title: Text(
           'Attend ASU',
-          style: TextStyle(color: Colors.black),
         ),
         actions: <Widget>[
           IconButton(
             icon: Icon(
               Icons.add,
-              color: Color(0xCC000000),
             ),
             onPressed: () {
               Navigator.of(context).pushNamed(JoinClassroomScreen.routeName);
@@ -64,7 +57,6 @@ class _StudentClassroomsScreenState extends State<StudentClassroomsScreen> {
           IconButton(
             icon: Icon(
               Icons.more_vert,
-              color: Color(0xCC000000),
             ),
             onPressed: () {},
           ),
@@ -73,6 +65,8 @@ class _StudentClassroomsScreenState extends State<StudentClassroomsScreen> {
       body: Selector<StudentClassrooms, bool>(
         selector: (_, instructor) => instructor.classroomsLoading,
         builder: (_, classroomsLoading, __) {
+          print(Provider.of<StudentClassrooms>(context, listen: false)
+              .classrooms);
           if (classroomsLoading) {
             return Center(
               child: CircularProgressIndicator(),

@@ -1,19 +1,27 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 
 import '../models/student.dart';
 import '../models/date.dart';
 
 class StudentClassrooms extends Student with ChangeNotifier {
   String _userId;
+  String _photo;
+
   List<dynamic> _classroomsReferences;
 
   bool _classroomsLoading = false;
   bool _joinClassroomLoading = false;
+
+  String get photo {
+    return this._photo;
+  }
 
   Firestore _firestore = Firestore.instance;
 
@@ -28,6 +36,7 @@ class StudentClassrooms extends Student with ChangeNotifier {
     this.name = student['fullName'];
     this.email = student['email'];
     this.collegeId = student['collegeId'];
+    this._photo = student['photo'];
     this._classroomsReferences = student['classrooms'];
   }
 
@@ -51,11 +60,16 @@ class StudentClassrooms extends Student with ChangeNotifier {
     this.classrooms = [];
 
     for (var classroomReference in _classroomsReferences) {
-      Map<String, dynamic> classroom = (await _firestore
-              .collection('classrooms')
-              .document(classroomReference)
-              .get())
-          .data;
+      DocumentSnapshot classroomDocument = await _firestore
+          .collection('classrooms')
+          .document(classroomReference)
+          .get();
+
+      if (!classroomDocument.exists) {
+        continue;
+      }
+
+      Map<String, dynamic> classroom = classroomDocument.data;
 
       List<dynamic> sessions = (await _firestore
               .collection('classrooms')
@@ -77,7 +91,9 @@ class StudentClassrooms extends Student with ChangeNotifier {
   Future<void> joinClassroom({
     @required String classroomCode,
   }) async {
-    joinClassroomLoading = true;
+    if (classrooms.any((classroom) => classroom.id == classroomCode)) {
+      throw Exception("Already joined!");
+    }
 
     await _firestore
         .collection('classrooms')
@@ -96,8 +112,6 @@ class StudentClassrooms extends Student with ChangeNotifier {
 
     await this.getUserIdAndNameAndEmailAndClassroomsReferences();
     await this.fetchClassrooms();
-
-    joinClassroomLoading = false;
   }
 
   Future<void> leaveClassroom({
@@ -122,18 +136,38 @@ class StudentClassrooms extends Student with ChangeNotifier {
     joinClassroomLoading = false;
   }
 
-  Future<void> attend(String classroomCode) async {
+  Future<void> attend(
+      {@required String classroomCode, @required String attendanceCode}) async {
     DateTime now = DateTime.now();
 
+    final attendanceConstraint = await _firestore
+        .collection('classrooms')
+        .document(classroomCode)
+        .collection('attendance constraints')
+        .document(Date.fromDateTime(DateTime.now()).toString())
+        .get();
+
+    if (!attendanceConstraint.exists) {
+      throw Exception("no code");
+    }
+
+    if (attendanceCode != attendanceConstraint.data['attendanceCode']) {
+      throw Exception("wrong code");
+    }
+
+    if (attendanceConstraint.data['attended'] >=
+        attendanceConstraint.data['numOfStudents']) {
+      throw Exception("expired code");
+    }
+
     await _firestore
         .collection('classrooms')
         .document(classroomCode)
-        .collection('students')
-        .document(_userId)
+        .collection('attendance constraints')
+        .document(Date.fromDateTime(DateTime.now()).toString())
         .updateData(
       {
-        'lastDateAttended':
-            Date(day: now.day, month: now.month, year: now.year),
+        'attended': FieldValue.increment(1),
       },
     );
 
@@ -144,9 +178,35 @@ class StudentClassrooms extends Student with ChangeNotifier {
         .document(_userId)
         .updateData(
       {
-        'classrooms': FieldValue.arrayUnion(
-            [Date(day: now.day, month: now.month, year: now.year)])
+        'lastDateAttended': Date.fromDateTime(now).toMap(),
+        'sessions': FieldValue.arrayUnion([Date.fromDateTime(now).toString()])
       },
     );
+
+    classrooms
+        .firstWhere((classroom) => classroom.id == classroomCode)
+        .sessions
+        .add(Date.fromDateTime(now).toString());
+  }
+
+  Future<void> uploadPhoto(File photo) async {
+    //  use the obtained ID to name the photo to be uploaded
+    StorageReference photoRef = FirebaseStorage.instance
+        .ref()
+        .child("profile_photos")
+        .child(this._userId);
+    StorageUploadTask uploadTask = photoRef.putFile(
+        photo, StorageMetadata(customMetadata: {"ownerId": this._userId}));
+
+    await uploadTask.onComplete;
+    String url = (await photoRef.getDownloadURL()).toString();
+
+    // now update the image in student's document with that same ID
+    DocumentReference db =
+        Firestore.instance.collection('students').document(this._userId);
+    await db.updateData({'photo': url});
+    this._photo = url;
+
+    notifyListeners();
   }
 }

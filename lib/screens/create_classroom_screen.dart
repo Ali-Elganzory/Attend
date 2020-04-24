@@ -313,7 +313,7 @@ class _CreateClassroomScreenState extends State<CreateClassroomScreen> {
                       decoration: minutesInputDecoration,
                       validator: validateMinutes,
                       onSaved: (minute) {
-                        this._startMinute = minute;
+                        this._endMinute = minute;
                       },
                     ),
                   )

@@ -123,6 +123,7 @@ class Auth with ChangeNotifier {
       _firestore.collection(_userTypeCollection()).document(_userId).setData({
         'fullName': fullName,
         'email': email,
+        'photo': null,
         if (userType == UserType.students) 'collegeId': collegeId,
         if (userType == UserType.students) 'classrooms': [],
       });

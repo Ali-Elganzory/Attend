@@ -58,20 +58,23 @@ class _JoinClassroomScreenState extends State<JoinClassroomScreen> {
                             if (_formKey.currentState.validate()) {
                               _formKey.currentState.save();
 
+                              StudentClassrooms staticStudent =
+                                  Provider.of<StudentClassrooms>(context,
+                                      listen: false);
+
+                              staticStudent.joinClassroomLoading = true;
+
                               try {
-                                await Provider.of<StudentClassrooms>(context,
-                                        listen: false)
-                                    .joinClassroom(
+                                await staticStudent.joinClassroom(
                                   classroomCode: _classroomCode,
                                 );
 
                                 Navigator.pop(context);
                               } catch (error) {
-                                Provider.of<StudentClassrooms>(context,
-                                        listen: false)
-                                    .joinClassroomLoading = false;
                                 showErrorDialog(context, error.toString());
                               }
+
+                              staticStudent.joinClassroomLoading = false;
                             }
                           }
                         : null,

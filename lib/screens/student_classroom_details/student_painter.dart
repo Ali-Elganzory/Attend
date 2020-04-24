@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-class LowerPartPainter extends CustomPainter {
+class StudentPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     double sh = size.height;
@@ -15,7 +15,16 @@ class LowerPartPainter extends CustomPainter {
     path.lineTo(sw, sh);
     path.close();
 
-    paint.color = Colors.blue.shade300;
+    var rect = Offset.zero & size;
+    paint.shader = LinearGradient(
+      begin: Alignment.topLeft,
+      end: Alignment.bottomRight,
+      colors: [
+        Color.fromRGBO(112, 252, 255, 1),
+        Color.fromRGBO(123, 112, 255, 1)
+      ],
+    ).createShader(rect);
+
     canvas.drawPath(path, paint);
   }
 

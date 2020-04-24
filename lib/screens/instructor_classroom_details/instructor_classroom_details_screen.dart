@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../components/instructor_drawer.dart';
+import '../../components/general_app_drawer.dart';
 
 import '../../screens/instructor_classroom_details/instructor_body.dart';
 
@@ -22,10 +22,14 @@ class InstructorClassroomDetailsScreen extends StatelessWidget {
     double sw = size.width; */
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(classroom.name),
+      drawer: GeneralAppDrawer(
+        userType: "instructor",
       ),
-      drawer: InstructorDrawer(),
+      appBar: AppBar(
+        title: Text(
+          '${classroom.name}',
+        ),
+      ),
       body: InstructorBody(classroom: classroom),
     );
   }

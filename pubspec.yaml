@@ -19,9 +19,11 @@ dependencies:
   path_provider: ^1.6.5
 
   table_calendar: ^2.2.3
+  image_picker: ^0.6.5+2
 
-  cloud_firestore: ^0.13.4+2
   firebase_auth: ^0.15.5+3
+  cloud_firestore: ^0.13.4+2
+  firebase_storage: ^3.1.5
 
   cupertino_icons: ^0.1.3
 

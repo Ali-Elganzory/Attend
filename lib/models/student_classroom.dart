@@ -7,7 +7,7 @@ class StudentClassroom extends Classroom {
   String _instructorName;
   String _instructorEmail;
   Date _lastDateAttended;
-  List<Date> _sessions;
+  List<String> _sessions;
 
   String get instructorName => this._instructorName;
 
@@ -27,9 +27,9 @@ class StudentClassroom extends Classroom {
     this._lastDateAttended = lastDateAttended;
   }
 
-  List<Date> get sessions => this._sessions;
+  List<String> get sessions => this._sessions;
 
-  set sessions(List<Date> sessions) {
+  set sessions(List<String> sessions) {
     this._sessions = sessions;
   }
 
@@ -43,7 +43,7 @@ class StudentClassroom extends Classroom {
     @required String instructorName,
     @required String instructorEmail,
     @required Date lastDateAttended,
-    List<Date> sessions,
+    List<String> sessions,
   }) : super(
             id: id,
             name: name,
@@ -75,9 +75,8 @@ class StudentClassroom extends Classroom {
       sessions: (classroom['sessions'] == null
               ? []
               : classroom['sessions'] as List<dynamic>)
-          .map((session) {
-        return Date.fromMap(session);
-      }).toList(),
+          .map((e) => e.toString())
+          .toList(),
     );
   }
 }

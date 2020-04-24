@@ -7,7 +7,7 @@ import '../providers/auth.dart';
 
 import '../models/instructor_classroom.dart';
 
-import '../components/instructor_drawer.dart';
+import '../components/general_app_drawer.dart';
 
 import './create_classroom_screen.dart';
 import './instructor_classroom_details/instructor_classroom_details_screen.dart';
@@ -39,7 +39,9 @@ class _InstructorClassroomsScreenState
     double sw = screenSize.width;
 
     return Scaffold(
-      drawer: InstructorDrawer(),
+      drawer: GeneralAppDrawer(
+        userType: "instructor",
+      ),
       appBar: AppBar(
         elevation: 1.5,
         title: Text(
