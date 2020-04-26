@@ -9,6 +9,10 @@ import '../providers/auth.dart';
 import '../providers/instructor_classrooms.dart';
 import '../providers/student_classrooms.dart';
 
+import '../components/custom_dialog.dart';
+
+import '../utils/excel/create_excel.dart';
+
 class GeneralAppDrawer extends StatelessWidget {
   const GeneralAppDrawer({
     Key key,
@@ -84,20 +88,8 @@ class GeneralAppDrawer extends StatelessWidget {
               },
             ),
             if (userType == "instructor")
-              ListTile(
-                leading: Icon(Icons.file_download, color: Colors.white),
-                title: Text(
-                  "Export ",
-                  style: TextStyle(color: Colors.white),
-                ),
-                trailing: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Image.asset('assets/images/ms_excel_icon.png'),
-                ),
-                onTap: () {
-                  Navigator.pop(context);
-                },
-              ),
+              ////    Where Excel sheets get exported   ////
+              ExportExcel(),
             ListTile(
               leading: Icon(
                 Icons.exit_to_app,
@@ -116,6 +108,66 @@ class GeneralAppDrawer extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+class ExportExcel extends StatefulWidget {
+  const ExportExcel({
+    Key key,
+  }) : super(key: key);
+
+  @override
+  _ExportExcelState createState() => _ExportExcelState();
+}
+
+class _ExportExcelState extends State<ExportExcel> {
+  bool exporting = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return ListTile(
+      leading: Icon(Icons.file_download, color: Colors.white),
+      title: Text(
+        "Export ",
+        style: TextStyle(color: Colors.white),
+      ),
+      trailing: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: exporting
+            ? CircularProgressIndicator()
+            : Image.asset('assets/images/ms_excel_icon.png'),
+      ),
+      onTap: () async {
+        setState(() {
+          this.exporting = true;
+        });
+
+        String path;
+
+        try {
+          path = await exportClassroomsToExcel(
+              Provider.of<Auth>(context, listen: false).userId);
+
+          Navigator.pop(context);
+
+          showDialog(
+            context: context,
+            builder: (ctx) => CustomDialog(
+              title: "Excel saved to:",
+              description: path,
+              positiveButtonText: "Okay",
+              negativeButtonText: null,
+            ),
+          );
+        } catch (error) {
+          showErrorDialog(context, error.toString());
+        }
+
+        setState(() {
+          this.exporting = false;
+        });
+      },
     );
   }
 }
