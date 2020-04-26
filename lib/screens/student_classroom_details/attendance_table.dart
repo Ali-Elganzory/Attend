@@ -85,6 +85,9 @@ class _AttendanceTableState extends State<AttendanceTable> {
           );
         },
         todayDayBuilder: (_, date, __) {
+          print('[Table] ${classroom.lastDateAttended}');
+          print(
+              '[Table] ${classroom.lastDateAttended == Date.fromDateTime(date)}');
           if (!offDays.contains(date.weekday))
             return Container(
               margin: EdgeInsets.all(5),
@@ -93,7 +96,7 @@ class _AttendanceTableState extends State<AttendanceTable> {
               decoration: BoxDecoration(
                 shape: BoxShape.rectangle,
                 borderRadius: BorderRadius.circular(10),
-                color: classroom.lastDateAttended == Date.fromDateTime(date)
+                color: classroom.lastDateAttended.same(Date.fromDateTime(date))
                     ? Colors.green
                     : Colors.white,
                 boxShadow: [
@@ -109,9 +112,10 @@ class _AttendanceTableState extends State<AttendanceTable> {
                   '${date.day}',
                   style: TextStyle(
                     fontSize: 16,
-                    color: classroom.lastDateAttended == Date.fromDateTime(date)
-                        ? Colors.white
-                        : Colors.blue,
+                    color:
+                        classroom.lastDateAttended.same(Date.fromDateTime(date))
+                            ? Colors.white
+                            : Colors.blue,
                   ),
                 ),
               ),
