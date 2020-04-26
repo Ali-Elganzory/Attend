@@ -93,8 +93,7 @@ class _AttendanceTableState extends State<AttendanceTable> {
               decoration: BoxDecoration(
                 shape: BoxShape.rectangle,
                 borderRadius: BorderRadius.circular(10),
-                color: classroom.sessions
-                        .contains(Date.fromDateTime(date).toString())
+                color: classroom.lastDateAttended == Date.fromDateTime(date)
                     ? Colors.green
                     : Colors.white,
                 boxShadow: [
@@ -110,8 +109,7 @@ class _AttendanceTableState extends State<AttendanceTable> {
                   '${date.day}',
                   style: TextStyle(
                     fontSize: 16,
-                    color: classroom.sessions
-                            .contains(Date.fromDateTime(date).toString())
+                    color: classroom.lastDateAttended == Date.fromDateTime(date)
                         ? Colors.white
                         : Colors.blue,
                   ),

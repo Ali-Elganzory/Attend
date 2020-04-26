@@ -35,9 +35,13 @@ Future<String> exportClassroomsToExcel(String uid) async {
     classrooms.add(classroom);
   }
 
-  Excel excel = Excel.createExcel();
+  Directory dir = await getExternalStorageDirectory();
+
+  print(dir.path);
 
   for (Map<String, dynamic> classroom in classrooms) {
+    Excel excel = Excel.createExcel();
+
     String sheet = classroom['name'];
 
     excel
@@ -60,21 +64,15 @@ Future<String> exportClassroomsToExcel(String uid) async {
 
       i++;
     }
+
+    excel.encode().then((onValue) {
+      File(join("${dir.path}/${classroom['name']}.xlsx"))
+        ..createSync(recursive: true)
+        ..writeAsBytesSync(onValue);
+    }).then((_) {
+      print('saved...');
+    });
   }
 
-  Directory dir = await getExternalStorageDirectory();
-
-  print(dir.path);
-
-  excel.encode().then((onValue) {
-    File(join(
-        "${dir.path}/${Date.fromDateTime(DateTime.now()).toString()}.xlsx"))
-      ..createSync(recursive: true)
-      ..writeAsBytesSync(onValue);
-  }).then((_) {
-    print('saved...');
-  });
-
-  return join(
-      "${dir.path}/${Date.fromDateTime(DateTime.now()).toString()}.xlsx");
+  return join("${dir.path}/");
 }
