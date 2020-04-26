@@ -34,11 +34,13 @@ class Date {
   }
 
   factory Date.fromMap(Map<String, dynamic> date) {
-    return Date(
-      day: date['day'] ?? 0,
-      month: date['month'] ?? 0,
-      year: date['year'] ?? 2000,
-    );
+    return date == null
+        ? Date(day: 4, month: 1, year: 2000)
+        : Date(
+            day: date['day'] ?? 0,
+            month: date['month'] ?? 0,
+            year: date['year'] ?? 2000,
+          );
   }
 
   factory Date.fromDateTime(DateTime date) {
