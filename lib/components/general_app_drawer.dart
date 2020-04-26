@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import 'package:provider/provider.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 import '../providers/auth.dart';
 import '../providers/instructor_classrooms.dart';
@@ -60,7 +61,7 @@ class GeneralAppDrawer extends StatelessWidget {
                             image: DecorationImage(
                               image: profile.photo == null
                                   ? AssetImage('assets/images/profile.png')
-                                  : NetworkImage(
+                                  : CachedNetworkImageProvider(
                                       profile.photo,
                                     ),
                               fit: BoxFit.cover,
@@ -199,6 +200,8 @@ class PhotoDialog extends StatelessWidget {
                 try {
                   File photo = await ImagePicker.pickImage(
                     source: ImageSource.camera,
+                    maxWidth: 400,
+                    maxHeight: 400,
                   );
 
                   Navigator.of(context).pop();
@@ -223,6 +226,8 @@ class PhotoDialog extends StatelessWidget {
                 try {
                   File photo = await ImagePicker.pickImage(
                     source: ImageSource.gallery,
+                    maxWidth: 400,
+                    maxHeight: 400,
                   );
 
                   Navigator.of(context).pop();
