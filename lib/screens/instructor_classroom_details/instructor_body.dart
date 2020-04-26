@@ -81,6 +81,11 @@ class _InstructorBodyState extends State<InstructorBody> {
                               itemCount: students.length,
                               itemBuilder: (_, index) {
                                 return Card(
+                                  color: students[index]
+                                          .lastDateAttended
+                                          .sameDateTime(DateTime.now())
+                                      ? Colors.green
+                                      : Colors.white,
                                   child: ListTile(
                                     leading: CircleAvatar(
                                       child: Text(
@@ -95,7 +100,24 @@ class _InstructorBodyState extends State<InstructorBody> {
                                     ),
                                     title: Text(
                                       students[index].name,
-                                      style: TextStyle(color: Colors.grey),
+                                      style: TextStyle(
+                                        color: students[index]
+                                                .lastDateAttended
+                                                .sameDateTime(DateTime.now())
+                                            ? Colors.white
+                                            : Colors.grey,
+                                          fontWeight: FontWeight.w400
+                                      ),
+                                    ),
+                                    trailing: Text(
+                                      students[index].collegeId,
+                                      style: TextStyle(
+                                        color: students[index]
+                                                .lastDateAttended
+                                                .sameDateTime(DateTime.now())
+                                            ? Colors.white
+                                            : Colors.grey,
+                                      ),
                                     ),
                                   ),
                                 );

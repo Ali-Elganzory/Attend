@@ -108,7 +108,7 @@ class Date {
   }
 
   bool sameDateTime(DateTime date) {
-    return compareDateTime(date) == 01;
+    return compareDateTime(date) == 0;
   }
 
   bool afterDateTime(DateTime date) {

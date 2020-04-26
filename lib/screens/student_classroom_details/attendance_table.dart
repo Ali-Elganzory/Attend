@@ -93,7 +93,10 @@ class _AttendanceTableState extends State<AttendanceTable> {
               decoration: BoxDecoration(
                 shape: BoxShape.rectangle,
                 borderRadius: BorderRadius.circular(10),
-                color: Colors.white,
+                color: classroom.sessions
+                        .contains(Date.fromDateTime(date).toString())
+                    ? Colors.green
+                    : Colors.white,
                 boxShadow: [
                   BoxShadow(
                     color: Color(0XFFe3e3e3),
@@ -105,7 +108,13 @@ class _AttendanceTableState extends State<AttendanceTable> {
               child: Center(
                 child: Text(
                   '${date.day}',
-                  style: TextStyle(fontSize: 16, color: Colors.blue),
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: classroom.sessions
+                            .contains(Date.fromDateTime(date).toString())
+                        ? Colors.white
+                        : Colors.blue,
+                  ),
                 ),
               ),
             );

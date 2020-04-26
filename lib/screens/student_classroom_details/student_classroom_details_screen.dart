@@ -122,41 +122,51 @@ class _StudentClassroomDetailsScreenState
                             height: 180.0,
                             width: 180.0,
                             margin: EdgeInsets.only(top: 20.0),
-                            child: RaisedButton(
-                              onPressed: enableAttend
-                                  ? () async {
-                                      if (_formKey.currentState.validate()) {
-                                        _formKey.currentState.save();
+                            child: Builder(
+                              builder: (ctx) => RaisedButton(
+                                onPressed: enableAttend
+                                    ? () async {
+                                        if (_formKey.currentState.validate()) {
+                                          _formKey.currentState.save();
 
-                                        try {
-                                          await Provider.of<StudentClassrooms>(
-                                                  context,
-                                                  listen: false)
-                                              .attend(
-                                            classroomCode: classroom.id,
-                                            attendanceCode: attendanceCode,
-                                          );
+                                          try {
+                                            await Provider.of<
+                                                        StudentClassrooms>(
+                                                    context,
+                                                    listen: false)
+                                                .attend(
+                                              classroomCode: classroom.id,
+                                              attendanceCode: attendanceCode,
+                                            );
 
-                                          classroom.lastDateAttended = now;
-                                          setState(() {});
-                                        } catch (error) {
-                                          showErrorDialog(
-                                              context, error.toString());
+                                            classroom.lastDateAttended = now;
+                                            setState(() {});
+
+                                            Scaffold.of(ctx).showSnackBar(
+                                              SnackBar(
+                                                content:
+                                                    Text("Attended today 🍇"),
+                                              ),
+                                            );
+                                          } catch (error) {
+                                            showErrorDialog(
+                                                context, error.toString());
+                                          }
                                         }
                                       }
-                                    }
-                                  : null,
-                              child: Text(
-                                'Attend',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 28,
+                                    : null,
+                                child: Text(
+                                  'Attend',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 28,
+                                  ),
                                 ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(200),
+                                ),
+                                color: Colors.deepPurpleAccent,
                               ),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(200),
-                              ),
-                              color: Colors.deepPurpleAccent,
                             ),
                           ),
                           const SizedBox(

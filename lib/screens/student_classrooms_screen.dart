@@ -140,6 +140,18 @@ class _StudentClassroomsScreenState extends State<StudentClassroomsScreen> {
                                   ),
                                 ),
                                 Positioned(
+                                  bottom: 12.0,
+                                  right: 14.0,
+                                  width: 200,
+                                  child: SelectableText(
+                                    '${classroom.instructorEmail}',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                    ),
+                                    textAlign: TextAlign.right,
+                                  ),
+                                ),
+                                Positioned(
                                   top: 10.0,
                                   right: 0.0,
                                   child: IconButton(
