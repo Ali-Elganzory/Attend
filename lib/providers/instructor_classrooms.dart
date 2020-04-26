@@ -8,11 +8,14 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 
 import '../models/instructor.dart';
+import '../models/instructor_student.dart';
 import '../models/date.dart';
 
 class InstructorClassrooms extends Instructor with ChangeNotifier {
   String _userId;
   String _photo;
+
+  List<dynamic> _classroomsReferences;
 
   bool _classroomsLoading = false;
   bool _createClassroomLoading = false;
@@ -23,19 +26,6 @@ class InstructorClassrooms extends Instructor with ChangeNotifier {
   }
 
   Firestore _firestore = Firestore.instance;
-
-  Future<void> getUserIdAndNameAndEmail() async {
-    final prefs = await SharedPreferences.getInstance();
-    final extractedUserData =
-        json.decode(prefs.getString('userData')) as Map<String, Object>;
-    _userId = extractedUserData['userId'];
-
-    DocumentSnapshot instructor =
-        await _firestore.collection('instructors').document(_userId).get();
-    this.name = instructor['fullName'];
-    this.email = instructor['email'];
-    this._photo = instructor['photo'];
-  }
 
   bool get classroomsLoading => this._classroomsLoading;
 
@@ -59,43 +49,60 @@ class InstructorClassrooms extends Instructor with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> fetchClassrooms() async {
-    classroomsLoading = true;
+  Future<void> getUserIdAndNameAndEmailAndClassroomsReferences() async {
+    final prefs = await SharedPreferences.getInstance();
+    final extractedUserData =
+        json.decode(prefs.getString('userData')) as Map<String, Object>;
+    _userId = extractedUserData['userId'];
 
-    QuerySnapshot classrooms = await _firestore
-        .collection('classrooms')
-        .where('owner', isEqualTo: _userId)
-        .getDocuments();
+    DocumentSnapshot instructor =
+        await _firestore.collection('instructors').document(_userId).get();
+    this.name = instructor['fullName'];
+    this.email = instructor['email'];
+    this._photo = instructor['photo'];
+    this._classroomsReferences = instructor['classrooms'];
+    ////////////////////////////////////////////////////////////////////////////
+    print(this._classroomsReferences);
+  }
+
+  Future<void> fetchClassrooms() async {
+    print('Heeerreeeee');
+    classroomsLoading = true;
 
     this.classrooms = [];
 
-    for (var classroom in classrooms.documents) {
-      Map<String, dynamic> students = {};
+    for (var classroomReference in _classroomsReferences) {
+      Stream<DocumentSnapshot> classroomStream = _firestore
+          .collection('classrooms')
+          .document(classroomReference)
+          .snapshots();
 
-      (await _firestore
-              .collection('classrooms')
-              .document(classroom.documentID)
-              .collection('students')
-              .getDocuments())
-          .documents
-          .forEach((studentDocument) {
-        students.putIfAbsent(
-            studentDocument.documentID, () => studentDocument.data);
-      });
-
-      Map<String, dynamic> data = classroom.data;
-      data.putIfAbsent('id', () => classroom.documentID);
-      data.putIfAbsent('students', () => students);
-
-      // print('${data['students']}');
-      // print('${data['id']}');
+      Stream<List<InstructorStudent>> studentsStream =
+          fetchClassroomStudents(classroomReference);
 
       super.addClassroom(
-        data,
+        classroomStream,
+        studentsStream,
       );
     }
 
     classroomsLoading = false;
+  }
+
+  Stream<List<InstructorStudent>> fetchClassroomStudents(String classroomId) {
+    return _firestore
+        .collection('classrooms')
+        .document(classroomId)
+        .collection('students')
+        .snapshots()
+        .map(
+          (query) => query.documents
+              .map(
+                (studentDocument) =>
+                    InstructorStudent.fromMap(studentDocument.data),
+              )
+              .toList(),
+        );
   }
 
   Future<String> createClassroom({
@@ -104,10 +111,9 @@ class InstructorClassrooms extends Instructor with ChangeNotifier {
     @required String startTime,
     @required String endTime,
   }) async {
-    createClassroomLoading = true;
-
     DocumentReference classroom =
-        await _firestore.collection('classrooms').add({
+        _firestore.collection('classrooms').document();
+    await classroom.setData({
       'createdAt': Date.fromDateTime(DateTime.now()).toMap(),
       'owner': _userId,
       'instructorName': this.name,
@@ -118,9 +124,12 @@ class InstructorClassrooms extends Instructor with ChangeNotifier {
       'endTime': endTime,
     });
 
-    await this.fetchClassrooms();
+    await _firestore.collection('instructors').document(_userId).updateData({
+      'classrooms': FieldValue.arrayUnion([classroom.documentID])
+    });
 
-    createClassroomLoading = false;
+    await this.getUserIdAndNameAndEmailAndClassroomsReferences();
+    await this.fetchClassrooms();
 
     return classroom.documentID;
   }
@@ -174,3 +183,40 @@ class InstructorClassrooms extends Instructor with ChangeNotifier {
     notifyListeners();
   }
 }
+
+/*  classroomsLoading = true;
+
+    QuerySnapshot classrooms = await _firestore
+        .collection('classrooms')
+        .where('owner', isEqualTo: _userId)
+        .getDocuments();
+
+    this.classrooms = [];
+
+    for (var classroom in classrooms.documents) {
+      Map<String, dynamic> students = {};
+
+      (await _firestore
+              .collection('classrooms')
+              .document(classroom.documentID)
+              .collection('students')
+              .getDocuments())
+          .documents
+          .forEach((studentDocument) {
+        students.putIfAbsent(
+            studentDocument.documentID, () => studentDocument.data);
+      });
+
+      Map<String, dynamic> data = classroom.data;
+      data.putIfAbsent('id', () => classroom.documentID);
+      data.putIfAbsent('students', () => students);
+
+      // print('${data['students']}');
+      // print('${data['id']}');
+
+      super.addClassroom(
+        data,
+      );
+    }
+
+    classroomsLoading = false; */

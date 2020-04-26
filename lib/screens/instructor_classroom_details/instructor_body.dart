@@ -5,15 +5,20 @@ import 'package:provider/provider.dart';
 import '../../providers/instructor_classrooms.dart';
 
 import '../../models/instructor_classroom.dart';
+import '../../models/instructor_student.dart';
 
 import '../../components/custom_dialog.dart';
 
 import './instructor_painter.dart';
 
 class InstructorBody extends StatefulWidget {
-  const InstructorBody({@required this.classroom});
+  const InstructorBody({
+    @required this.classroom,
+    @required this.initialStudentsSnapshot,
+  });
 
   final InstructorClassroom classroom;
+  final List<InstructorStudent> initialStudentsSnapshot;
 
   @override
   _InstructorBodyState createState() => _InstructorBodyState();
@@ -65,27 +70,42 @@ class _InstructorBodyState extends State<InstructorBody> {
               enable
                   ? Container(
                       height: sh * 0.68,
-                      child: ListView.builder(
-                        itemCount: widget.classroom.students.length,
-                        itemBuilder: (context, index) {
-                          return Card(
-                            child: ListTile(
-                              leading: CircleAvatar(
-                                child: Text(
-                                  widget
-                                      .classroom.students[index].sessions.length
-                                      .toString(),
-                                  style: TextStyle(color: Colors.white),
-                                ),
-                                backgroundColor:
-                                    Color.fromRGBO(126, 185, 255, 1),
-                              ),
-                              title: Text(
-                                widget.classroom.students[index].name,
-                                style: TextStyle(color: Colors.grey),
-                              ),
-                            ),
-                          );
+                      child: StreamBuilder<List<InstructorStudent>>(
+                        stream: widget.classroom.students,
+                        initialData: widget.initialStudentsSnapshot,
+                        builder: (_, snapshot) {
+                          if (snapshot.hasData) {
+                            List<InstructorStudent> students = snapshot.data;
+
+                            return ListView.builder(
+                              itemCount: students.length,
+                              itemBuilder: (_, index) {
+                                return Card(
+                                  child: ListTile(
+                                    leading: CircleAvatar(
+                                      child: Text(
+                                        students[index]
+                                            .sessions
+                                            .length
+                                            .toString(),
+                                        style: TextStyle(color: Colors.white),
+                                      ),
+                                      backgroundColor:
+                                          Color.fromRGBO(126, 185, 255, 1),
+                                    ),
+                                    title: Text(
+                                      students[index].name,
+                                      style: TextStyle(color: Colors.grey),
+                                    ),
+                                  ),
+                                );
+                              },
+                            );
+                          } else {
+                            return Center(
+                              child: CircularProgressIndicator(),
+                            );
+                          }
                         },
                       ),
                     )

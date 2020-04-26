@@ -45,64 +45,73 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider<Auth>(
           create: (_) => Auth(),
         ),
-        ChangeNotifierProvider<InstructorClassrooms>(
-          create: (_) => InstructorClassrooms(),
-        ),
-        ChangeNotifierProvider<StudentClassrooms>(
-          create: (_) => StudentClassrooms(),
-        ),
       ],
-      child: MaterialApp(
-        theme: appThemeData,
-        home: Selector<Auth, bool>(
-          selector: (_, auth) {
-            _staticAuthProvider = auth;
-            return auth.isAuth;
-          },
-          builder: (_, isAuth, __) {
-            bool isStudent = _staticAuthProvider.userType == UserType.students;
-
-            return isAuth
-                ? isStudent
-                    ? StudentClassroomsScreen()
-                    : InstructorClassroomsScreen()
-                : FutureBuilder(
-                    future: _staticAuthProvider.tryAutoLogin(),
-                    builder: (_, authResultSnapshot) {
-                      if (authResultSnapshot.connectionState ==
-                          ConnectionState.done) {
-                        if (authResultSnapshot.data) {
-                          return isStudent
-                              ? StudentClassroomsScreen()
-                              : InstructorClassroomsScreen();
-                        } else {
-                          return AuthScreen();
-                        }
-                      } else {
-                        return SplashScreen();
-                      }
-                    },
-                  );
-          },
-        ),
-        routes: {
-          CreateClassroomScreen.routeName: (_) => CreateClassroomScreen(),
-          JoinClassroomScreen.routeName: (_) => JoinClassroomScreen(),
+      child: Selector<Auth, bool>(
+        selector: (_, auth) {
+          _staticAuthProvider = auth;
+          return auth.isAuth;
         },
-        onGenerateRoute: (settings) {
-          if (settings.name == InstructorClassroomDetailsScreen.routName) {
-            return MaterialPageRoute(
-              builder: (context) => InstructorClassroomDetailsScreen(
-                classroom: settings.arguments,
+        builder: (_, isAuth, __) {
+          bool isStudent = _staticAuthProvider.userType == UserType.students;
+
+          return MultiProvider(
+            providers: [
+              ChangeNotifierProvider<InstructorClassrooms>(
+                create: (_) => InstructorClassrooms(),
               ),
-            );
-          } else if (settings.name == StudentClassroomDetailsScreen.routName) {
-            return MaterialPageRoute(
-              builder: (context) => StudentClassroomDetailsScreen(
-                classroom: settings.arguments,
+              ChangeNotifierProvider<StudentClassrooms>(
+                create: (_) => StudentClassrooms(),
               ),
-            );
-          }
+            ],
+            child: MaterialApp(
+              theme: appThemeData,
+              home: isAuth
+                  ? isStudent
+                      ? StudentClassroomsScreen()
+                      : InstructorClassroomsScreen()
+                  : FutureBuilder(
+                      future: _staticAuthProvider.tryAutoLogin(),
+                      builder: (_, authResultSnapshot) {
+                        if (authResultSnapshot.connectionState ==
+                            ConnectionState.done) {
+                          if (authResultSnapshot.data) {
+                            return isStudent
+                                ? StudentClassroomsScreen()
+                                : InstructorClassroomsScreen();
+                          } else {
+                            return AuthScreen();
+                          }
+                        } else {
+                          return SplashScreen();
+                        }
+                      },
+                    ),
+              routes: {
+                CreateClassroomScreen.routeName: (_) => CreateClassroomScreen(),
+                JoinClassroomScreen.routeName: (_) => JoinClassroomScreen(),
+              },
+              onGenerateRoute: (settings) {
+                if (settings.name ==
+                    InstructorClassroomDetailsScreen.routName) {
+                  return MaterialPageRoute(
+                    builder: (context) => InstructorClassroomDetailsScreen(
+                      classroomStream: (settings.arguments as List)[0],
+                      initialClassroomSnapshot: (settings.arguments as List)[1],
+                      initialStudentsSnapshot: (settings.arguments as List)[2],
+                    ),
+                  );
+                } else if (settings.name ==
+                    StudentClassroomDetailsScreen.routName) {
+                  return MaterialPageRoute(
+                    builder: (context) => StudentClassroomDetailsScreen(
+                      classroomStream: (settings.arguments as List)[0],
+                      initialSnapshot: (settings.arguments as List)[1],
+                    ),
+                  );
+                }
+              },
+            ),
+          );
         },
       ),
     );

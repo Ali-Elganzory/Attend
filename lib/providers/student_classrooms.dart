@@ -60,29 +60,30 @@ class StudentClassrooms extends Student with ChangeNotifier {
     this.classrooms = [];
 
     for (var classroomReference in _classroomsReferences) {
-      DocumentSnapshot classroomDocument = await _firestore
+      Stream<DocumentSnapshot> classroomStream = _firestore
           .collection('classrooms')
           .document(classroomReference)
-          .get();
+          .snapshots();
 
-      if (!classroomDocument.exists) {
-        continue;
-      }
+      DocumentSnapshot student = (await _firestore
+          .collection('classrooms')
+          .document(classroomReference)
+          .collection('students')
+          .document(_userId)
+          .get());
 
-      Map<String, dynamic> classroom = classroomDocument.data;
+      List<dynamic> sessions = student['sessions'];
+      Date lastDateAttended = Date.fromMap(student['lastDateAttended']);
 
-      List<dynamic> sessions = (await _firestore
-              .collection('classrooms')
-              .document(classroomReference)
-              .collection('students')
-              .document(_userId)
-              .get())
-          .data['sessions'];
-
-      classroom.putIfAbsent('id', () => classroomReference);
-      classroom.putIfAbsent('sessions', () => sessions);
-
-      super.addClassroom(classroom);
+      super.addClassroom(
+        classroomStream,
+        sessions
+            .map(
+              (e) => e.toString(),
+            )
+            .toList(),
+        lastDateAttended,
+      );
     }
 
     classroomsLoading = false;
@@ -91,7 +92,7 @@ class StudentClassrooms extends Student with ChangeNotifier {
   Future<void> joinClassroom({
     @required String classroomCode,
   }) async {
-    if (classrooms.any((classroom) => classroom.id == classroomCode)) {
+    if (this._classroomsReferences.contains(classroomCode)) {
       throw Exception("Already joined!");
     }
 
@@ -148,16 +149,16 @@ class StudentClassrooms extends Student with ChangeNotifier {
         .get();
 
     if (!attendanceConstraint.exists) {
-      throw Exception("no code");
+      throw "The teacher didn't provide a code, yet";
     }
 
     if (attendanceCode != attendanceConstraint.data['attendanceCode']) {
-      throw Exception("wrong code");
+      throw "Wrong code";
     }
 
     if (attendanceConstraint.data['attended'] >=
         attendanceConstraint.data['numOfStudents']) {
-      throw Exception("expired code");
+      throw "Expired code";
     }
 
     await _firestore
@@ -183,10 +184,10 @@ class StudentClassrooms extends Student with ChangeNotifier {
       },
     );
 
-    classrooms
-        .firstWhere((classroom) => classroom.id == classroomCode)
-        .sessions
-        .add(Date.fromDateTime(now).toString());
+    // classrooms
+    //     .firstWhere((classroom) => classroom.id == classroomCode)
+    //     .sessions
+    //     .add(Date.fromDateTime(now).toString());
   }
 
   Future<void> uploadPhoto(File photo) async {

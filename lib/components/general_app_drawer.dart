@@ -110,6 +110,7 @@ class GeneralAppDrawer extends StatelessWidget {
               onTap: () {
                 Navigator.pop(context);
                 Provider.of<Auth>(context, listen: false).logout();
+                Navigator.popUntil(context, (route) => route.isFirst);
               },
             ),
           ],

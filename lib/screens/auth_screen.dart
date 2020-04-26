@@ -35,7 +35,7 @@ class AuthScreen extends StatelessWidget {
     double sw = deviceSize.width;
     int _animationDuration = 300;
 
-    Auth _staticAuthProvider = Provider.of<Auth>(context);
+    Auth _staticAuthProvider = Provider.of<Auth>(context, listen: false);
 
     return Scaffold(
       // resizeToAvoidBottomInset: false,

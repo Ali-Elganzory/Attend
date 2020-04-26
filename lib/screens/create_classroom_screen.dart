@@ -98,12 +98,15 @@ class _CreateClassroomScreenState extends State<CreateClassroomScreen> {
                             if (_formKey.currentState.validate()) {
                               _formKey.currentState.save();
 
+                              InstructorClassrooms staticInstructor =
+                                  Provider.of<InstructorClassrooms>(context,
+                                      listen: false);
+
+                              staticInstructor.createClassroomLoading = true;
+
                               try {
                                 String classCode =
-                                    await Provider.of<InstructorClassrooms>(
-                                            context,
-                                            listen: false)
-                                        .createClassroom(
+                                    await staticInstructor.createClassroom(
                                   name: this._name,
                                   weekDay: weekDayIndex[this._weekDay],
                                   startTime:
@@ -124,11 +127,10 @@ class _CreateClassroomScreenState extends State<CreateClassroomScreen> {
                                   ),
                                 );
                               } catch (error) {
-                                Provider.of<InstructorClassrooms>(context,
-                                        listen: false)
-                                    .createClassroomLoading = false;
                                 showErrorDialog(context, error.toString());
                               }
+
+                              staticInstructor.createClassroomLoading = false;
                             }
                           }
                         : null,

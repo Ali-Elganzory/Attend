@@ -17,7 +17,7 @@ class AttendanceTable extends StatefulWidget {
 class _AttendanceTableState extends State<AttendanceTable> {
   StudentClassroom classroom;
 
-  List<int> offDays = [DateTime.friday];
+  List<int> offDays = [/* DateTime.friday */];
 
   CalendarController _calendarController;
 

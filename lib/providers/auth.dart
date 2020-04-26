@@ -115,17 +115,20 @@ class Auth with ChangeNotifier {
 
     if (operation == "signup") {
       //  Set user's type in firestore -> Collection('users')
-      _firestore
+      await _firestore
           .collection('users')
           .document(userId)
           .setData({'userType': userType.toShortString()});
 
-      _firestore.collection(_userTypeCollection()).document(_userId).setData({
+      await _firestore
+          .collection(_userTypeCollection())
+          .document(_userId)
+          .setData({
         'fullName': fullName,
         'email': email,
         'photo': null,
+        'classrooms': [],
         if (userType == UserType.students) 'collegeId': collegeId,
-        if (userType == UserType.students) 'classrooms': [],
       });
     }
 
@@ -145,7 +148,8 @@ class Auth with ChangeNotifier {
         'userType': userType.toShortString(),
       },
     );
-    prefs.setString('userData', userData);
+
+    await prefs.setString('userData', userData);
   }
 
   Future<void> signup(

@@ -1,5 +1,7 @@
 import 'package:flutter/foundation.dart';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 import './classroom.dart';
 import './date.dart';
 
@@ -57,10 +59,13 @@ class StudentClassroom extends Classroom {
     this._sessions = sessions;
   }
 
-  factory StudentClassroom.fromMap(Map<String, dynamic> classroom) {
+  static StudentClassroom fromMap(DocumentSnapshot classroomDocument) {
+    Map<String, dynamic> classroom = classroomDocument.data;
+
     print(classroom);
+
     return StudentClassroom(
-      id: classroom['id'] ?? "",
+      id: classroomDocument.documentID ?? "",
       name: classroom['name'] ?? "",
       createdAt: classroom['createdAt'] == null
           ? Date.fromDateTime(DateTime.now())

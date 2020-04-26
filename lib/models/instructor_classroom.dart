@@ -5,11 +5,11 @@ import './instructor_student.dart';
 import './date.dart';
 
 class InstructorClassroom extends Classroom {
-  List<InstructorStudent> _students;
+  Stream<List<InstructorStudent>> _students;
 
-  List<InstructorStudent> get students => this._students;
+  Stream<List<InstructorStudent>> get students => this._students;
 
-  set students(List<InstructorStudent> students) {
+  set students(Stream<List<InstructorStudent>> students) {
     this._students = students;
   }
 
@@ -20,7 +20,7 @@ class InstructorClassroom extends Classroom {
     @required int weekDay,
     @required String startTime,
     @required String endTime,
-    List<InstructorStudent> students,
+    Stream<List<InstructorStudent>> students,
   }) : super(
             id: id,
             name: name,

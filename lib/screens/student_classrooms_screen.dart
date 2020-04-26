@@ -64,6 +64,7 @@ class _StudentClassroomsScreenState extends State<StudentClassroomsScreen> {
       ),
       body: Selector<StudentClassrooms, bool>(
         selector: (_, instructor) => instructor.classroomsLoading,
+        shouldRebuild: (_, __) => true,
         builder: (_, classroomsLoading, __) {
           print(Provider.of<StudentClassrooms>(context, listen: false)
               .classrooms);
@@ -72,7 +73,7 @@ class _StudentClassroomsScreenState extends State<StudentClassroomsScreen> {
               child: CircularProgressIndicator(),
             );
           } else {
-            List<StudentClassroom> _classrooms =
+            List<Stream<StudentClassroom>> _classrooms =
                 Provider.of<StudentClassrooms>(context, listen: false)
                     .classrooms;
             if (_classrooms == null || _classrooms.isEmpty) {
@@ -84,66 +85,82 @@ class _StudentClassroomsScreenState extends State<StudentClassroomsScreen> {
               padding: EdgeInsets.all(0.04 * sw),
               itemCount: _classrooms.length,
               itemBuilder: (_, index) {
-                return InkWell(
-                  onTap: () {
-                    Navigator.of(context).pushNamed(
-                      StudentClassroomDetailsScreen.routName,
-                      arguments: _classrooms[index],
-                    );
-                  },
-                  child: AspectRatio(
-                    aspectRatio: 2.5 / 1.0,
-                    child: Container(
-                      width: double.maxFinite,
-                      clipBehavior: Clip.antiAlias,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(9.0),
-                        image: DecorationImage(
-                          fit: BoxFit.cover,
-                          image:
-                              AssetImage('assets/images/classroom_cover.jpg'),
+                return StreamBuilder<StudentClassroom>(
+                  stream: _classrooms[index],
+                  builder: (_, snapshot) {
+                    if (snapshot.hasData) {
+                      StudentClassroom classroom = snapshot.data;
+
+                      return InkWell(
+                        onTap: () {
+                          Navigator.of(context).pushNamed(
+                            StudentClassroomDetailsScreen.routName,
+                            arguments: [
+                              _classrooms[index],
+                              classroom,
+                            ],
+                          );
+                        },
+                        child: AspectRatio(
+                          aspectRatio: 2.5 / 1.0,
+                          child: Container(
+                            width: double.maxFinite,
+                            clipBehavior: Clip.antiAlias,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(9.0),
+                              image: DecorationImage(
+                                fit: BoxFit.cover,
+                                image: AssetImage(
+                                    'assets/images/classroom_cover.jpg'),
+                              ),
+                            ),
+                            child: Stack(
+                              children: <Widget>[
+                                Positioned(
+                                  top: 18.0,
+                                  left: 14.0,
+                                  child: Text(
+                                    classroom.name,
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 20.0,
+                                    ),
+                                    overflow: TextOverflow.ellipsis,
+                                    maxLines: 1,
+                                  ),
+                                ),
+                                Positioned(
+                                  bottom: 12.0,
+                                  left: 14.0,
+                                  child: Text(
+                                    '${classroom.instructorName}',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ),
+                                Positioned(
+                                  top: 10.0,
+                                  right: 0.0,
+                                  child: IconButton(
+                                    icon: Icon(
+                                      Icons.more_vert,
+                                      color: Colors.white,
+                                    ),
+                                    onPressed: () {},
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
                         ),
-                      ),
-                      child: Stack(
-                        children: <Widget>[
-                          Positioned(
-                            top: 18.0,
-                            left: 14.0,
-                            child: Text(
-                              _classrooms[index].name,
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 20.0,
-                              ),
-                              overflow: TextOverflow.ellipsis,
-                              maxLines: 1,
-                            ),
-                          ),
-                          Positioned(
-                            bottom: 12.0,
-                            left: 14.0,
-                            child: Text(
-                              '${_classrooms[index].instructorName}',
-                              style: TextStyle(
-                                color: Colors.white,
-                              ),
-                            ),
-                          ),
-                          Positioned(
-                            top: 10.0,
-                            right: 0.0,
-                            child: IconButton(
-                              icon: Icon(
-                                Icons.more_vert,
-                                color: Colors.white,
-                              ),
-                              onPressed: () {},
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
+                      );
+                    } else {
+                      return Center(
+                        child: CircularProgressIndicator(),
+                      );
+                    }
+                  },
                 );
               },
               separatorBuilder: (_, index) {

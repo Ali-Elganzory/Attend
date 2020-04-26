@@ -5,7 +5,7 @@ import './date.dart';
 
 class InstructorStudent extends Person {
   String _collegeId;
-  List<Date> _sessions;
+  List<String> _sessions;
 
   String get collegeId => this._collegeId;
 
@@ -13,16 +13,16 @@ class InstructorStudent extends Person {
     this._collegeId = collegeId;
   }
 
-  List<Date> get sessions => this._sessions;
+  List<String> get sessions => this._sessions;
 
-  set sessions(List<Date> sessions) {
+  set sessions(List<String> sessions) {
     this._sessions = sessions;
   }
 
   InstructorStudent({
     @required String name,
     @required String collegeId,
-    @required List<Date> sessions,
+    @required List<String> sessions,
   }) {
     this.name = name;
     this._collegeId = collegeId;
@@ -33,13 +33,9 @@ class InstructorStudent extends Person {
     return InstructorStudent(
       name: student['name'],
       collegeId: student['collegeId'],
-      sessions: student['sessions'].map<Date>((session) {
-        return Date(
-          day: session['day'],
-          month: session['month'],
-          year: session['year'],
-        );
-      }).toList(),
+      sessions: student['sessions']
+          .map<String>((session) => session.toString())
+          .toList(),
     );
   }
 }
